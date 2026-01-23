@@ -1,0 +1,472 @@
+/* =====================================================
+   NARUTO-THEMED PORTFOLIO - GLOBAL STYLES
+   ===================================================== */
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Inter:wght@400;500;600&display=swap');
+
+/* =====================================================
+   CSS VARIABLES - NARUTO THEME
+   ===================================================== */
+:root {
+  /* Colors */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-tertiary: #1a1a1a;
+
+  /* Sharingan Colors */
+  --sharingan-red: #E63946;
+  --sharingan-red-dark: #DC2626;
+  --sharingan-red-glow: rgba(230, 57, 70, 0.6);
+
+  /* Rinnegan Colors */
+  --rinnegan-purple: #8B5CF6;
+  --rinnegan-purple-dark: #7C3AED;
+  --rinnegan-purple-glow: rgba(139, 92, 246, 0.6);
+
+  /* Chakra Colors */
+  --chakra-blue: #3B82F6;
+  --chakra-blue-glow: rgba(59, 130, 246, 0.5);
+
+  /* Amaterasu */
+  --amaterasu-black: #1a0a0a;
+
+  /* Text Colors */
+  --text-primary: #F5F5F5;
+  --text-secondary: #a0a0a0;
+  --text-muted: #666666;
+
+  /* Typography */
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Spacing */
+  --section-padding: clamp(4rem, 10vh, 8rem);
+  --container-max: 1200px;
+
+  /* Animation */
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.4s ease;
+  --transition-slow: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =====================================================
+   RESET & BASE STYLES
+   ===================================================== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--sharingan-red);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sharingan-red-dark);
+}
+
+/* =====================================================
+   TYPOGRAPHY
+   ===================================================== */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 900;
+}
+
+h2 {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--chakra-blue);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--rinnegan-purple);
+}
+
+/* =====================================================
+   UTILITY CLASSES
+   ===================================================== */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.section {
+  min-height: 100vh;
+  padding: var(--section-padding) 0;
+  position: relative;
+}
+
+.text-gradient-sharingan {
+  background: linear-gradient(135deg, var(--sharingan-red) 0%, var(--sharingan-red-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-rinnegan {
+  background: linear-gradient(135deg, var(--rinnegan-purple) 0%, var(--chakra-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glow-red {
+  text-shadow: 0 0 20px var(--sharingan-red-glow),
+    0 0 40px var(--sharingan-red-glow);
+}
+
+.glow-purple {
+  text-shadow: 0 0 20px var(--rinnegan-purple-glow),
+    0 0 40px var(--rinnegan-purple-glow);
+}
+
+.glow-blue {
+  text-shadow: 0 0 20px var(--chakra-blue-glow),
+    0 0 40px var(--chakra-blue-glow);
+}
+
+/* =====================================================
+   BUTTON STYLES
+   ===================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-medium);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--sharingan-red) 0%, var(--sharingan-red-dark) 100%);
+  color: white;
+  box-shadow: 0 4px 20px var(--sharingan-red-glow);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px var(--sharingan-red-glow);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--rinnegan-purple);
+}
+
+.btn-secondary:hover {
+  background: var(--rinnegan-purple);
+  box-shadow: 0 4px 20px var(--rinnegan-purple-glow);
+}
+
+/* Button Seal Animation */
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* =====================================================
+   ANIMATIONS KEYFRAMES
+   ===================================================== */
+
+/* Chakra Pulse */
+@keyframes chakraPulse {
+
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* Sharingan Spin */
+@keyframes sharinganSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Kamui Spiral */
+@keyframes kamuiSpiral {
+  0% {
+    clip-path: circle(0% at 50% 50%);
+    transform: rotate(0deg);
+  }
+
+  100% {
+    clip-path: circle(150% at 50% 50%);
+    transform: rotate(720deg);
+  }
+}
+
+/* Float Animation */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Kunai Slash */
+@keyframes kunaiSlash {
+  0% {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  }
+
+  100% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+/* Amaterasu Flicker */
+@keyframes amaterasuFlicker {
+
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    filter: brightness(1.2);
+  }
+}
+
+/* Fade In Up */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale In */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* =====================================================
+   RESPONSIVE BREAKPOINTS
+   ===================================================== */
+
+/* Large tablets and small desktops */
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+  :root {
+    --section-padding: clamp(3rem, 8vh, 5rem);
+  }
+
+  .section {
+    min-height: auto;
+    padding: 4rem 0;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 5vw, 2.25rem);
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    /* Larger touch target */
+    min-height: 48px;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+
+  .section {
+    padding: 3rem 0;
+  }
+
+  h1 {
+    font-size: clamp(1.75rem, 10vw, 2.5rem);
+  }
+
+  h2 {
+    font-size: clamp(1.35rem, 6vw, 1.75rem);
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+
+  p {
+    font-size: 0.95rem;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.875rem 1.25rem;
+  }
+}
+
+/* Small mobile phones */
+@media (max-width: 360px) {
+  html {
+    font-size: 13px;
+  }
+
+  .container {
+    padding: 0 0.75rem;
+  }
+}
+
+/* =====================================================
+   ACCESSIBILITY
+   ===================================================== */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Focus styles for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--chakra-blue);
+  outline-offset: 4px;
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
