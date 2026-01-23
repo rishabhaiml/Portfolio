@@ -246,18 +246,33 @@
   // Color based on stage
   $: eyeColor = $sageMode
     ? "#FF8C00"
-    : $eyeEvolution >= 5
+    : effectiveEvolution >= 5
       ? "#8B5CF6"
       : "#E63946";
 
   $: glowColor = $sageMode
     ? "rgba(255, 140, 0, var(--glow))"
-    : $eyeEvolution >= 5
+    : effectiveEvolution >= 5
       ? "rgba(139, 92, 246, var(--glow))"
       : "rgba(230, 57, 70, var(--glow))";
 
   // Combined glow for activation
   $: combinedGlow = Math.max(glowIntensity, $activation.glow);
+
+  $: effectiveStageName = (() => {
+    if (variant === "sasuke-rinne" && effectiveEvolution === 4)
+      return "Rinne Sharingan";
+    const stages = [
+      "Normal",
+      "1-Tomoe Sharingan",
+      "2-Tomoe Sharingan",
+      "3-Tomoe Sharingan",
+      "Mangekyou Sharingan",
+      "Rinnegan",
+      "Character Special",
+    ];
+    return stages[effectiveEvolution] || "Unknown";
+  })();
 </script>
 
 <div
@@ -266,7 +281,7 @@
   class:evolving={isEvolving}
   class:activating={isActivating}
   role="img"
-  aria-label="Sharingan Eye - {$eyeStageName}"
+  aria-label="Sharingan Eye - {effectiveStageName}"
 >
   <!-- Stage 0: Normal Eye -->
   {#if effectiveEvolution === 0}
@@ -410,9 +425,9 @@
             <circle style="fill:#000;" cx="150" cy="150" r="25" />
           </g>
         {:else}
-          {#each Array($eyeEvolution) as _, i}
+          {#each Array(effectiveEvolution) as _, i}
             <!-- Generic 1-tomoe generation (keeps existing logic for stage 1) -->
-            {@const angleDeg = i * (360 / $eyeEvolution)}
+            {@const angleDeg = i * (360 / effectiveEvolution)}
             {@const angleRad = (angleDeg * Math.PI) / 180}
             {@const radius = 45}
             {@const x = 100 + radius * Math.sin(angleRad)}
@@ -1072,7 +1087,7 @@
 
   <!-- Label (optional) -->
   {#if showLabel}
-    <span class="eye-label">{$eyeStageName}</span>
+    <span class="eye-label">{effectiveStageName}</span>
   {/if}
 </div>
 
