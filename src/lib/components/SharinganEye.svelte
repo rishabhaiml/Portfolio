@@ -27,6 +27,8 @@
     | "gaara" = "itachi";
 
   export let stage: number | null = null;
+  export let externalRotation: number = 0;
+  export let allowIdleRotation: boolean = true;
 
   // Trigger activation animation externally
   export let triggerActivation: boolean = false;
@@ -177,15 +179,15 @@
     activationComplete = true;
   }
 
-  // React to evolution changes
-  $: if ($eyeEvolution !== previousStage) {
+  // React to evolution changes (including via stage prop)
+  $: if (effectiveEvolution !== previousStage) {
     triggerEvolution();
-    previousStage = $eyeEvolution;
+    previousStage = effectiveEvolution;
   }
 
   // Performance fix: Guard against redundant rotation starts
   $: {
-    if ($eyeEvolution >= 1 && $eyeEvolution <= 3) {
+    if ($eyeEvolution >= 1 && $eyeEvolution <= 3 && allowIdleRotation) {
       if (!isRotating) {
         isRotating = true;
         startRotation();
@@ -356,7 +358,8 @@
       <!-- TOMOE: User's exact SVG with polar coordinate placement -->
       <g
         class="tomoe-group"
-        style="transform: rotate({$rotation}deg); transform-origin: 100px 100px;"
+        style="transform: rotate({$rotation +
+          externalRotation}deg); transform-origin: 100px 100px;"
       >
         {#if effectiveEvolution === 2}
           <!-- User's exact 2-tomoe SVG scaled (0.66x to fit 200px) -->
@@ -475,7 +478,8 @@
       <g
         class="mangekyou-pattern"
         class:activating={isActivating}
-        style="transform: rotate({$activation.rotation}deg); transform-origin: 100px 100px;"
+        style="transform: rotate({$activation.rotation +
+          externalRotation}deg); transform-origin: 100px 100px;"
       >
         {#if variant === "itachi"}
           <!-- ITACHI'S MANGEKYOU: User's exact curved blade pattern -->

@@ -21,6 +21,7 @@
   // Eye Integration State
   let eyeScale = 1;
   let eyeStage = 1;
+  let eyeRotation = 0;
   let eyeVariant: "sasuke" | "sasuke-rinne" = "sasuke";
   let hasScrolledOnce = false;
 
@@ -97,6 +98,9 @@
       eyeStage = 4; // Rinne Sharingan (technically a variant of Mangekyou stage in this component logic)
       eyeVariant = "sasuke-rinne";
     }
+
+    // Calculate rotation based on core scroll progress (360 degrees for full scroll)
+    eyeRotation = (scrollProgress / 100) * 360;
   }
 
   onMount(() => {
@@ -126,6 +130,8 @@
         size={32}
         variant={eyeVariant}
         stage={eyeStage}
+        externalRotation={eyeRotation}
+        allowIdleRotation={false}
         triggerActivation={scrollProgress > 90 && eyeVariant === "sasuke-rinne"}
       />
     </div>
@@ -329,14 +335,17 @@
 
   /* State 2: Progress Bar Head Position */
   .eye-progress-indicator.at-progress {
-    /* Top is navbar height (approx) + progress position */
+    /* Smoother vertical transition: 
+       Start at 36px (logo pos) and slide to progress pos (3.5rem + 15px = ~71px) 
+       over first 10% of scroll progress */
     top: calc(
-      100% - 2px
-    ); /* Relative to parent if absolute, but we are fixed now */
-    /* Since we are fixed, we need to know the navbar height. 
-       Standard nav is ~padding 1rem top/bottom + content. 
-       Let's drop it to just below the navbar glass */
-    top: calc(3.5rem + 15px);
+      2.25rem +
+        clamp(
+          0rem,
+          (var(--raw-progress) / 10) * (3.5rem + 15px - 2.25rem),
+          3.5rem + 15px - 2.25rem
+        )
+    );
 
     /* Start from logo position and travel to end of screen */
     left: calc(
