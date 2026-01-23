@@ -18,6 +18,12 @@
   let scrolled = false;
   let scrollProgress = 0;
 
+  // Eye Integration State
+  let eyeScale = 1;
+  let eyeStage = 1;
+  let eyeVariant: "sasuke" | "sasuke-rinne" = "sasuke";
+  let hasScrolledOnce = false;
+
   const navItems = [
     { name: "Home", section: 0 },
     { name: "Skills", section: 1 },
@@ -62,6 +68,35 @@
 
     // Calculate scroll progress (0-100)
     scrollProgress = docHeight > 0 ? (scrollY / docHeight) * 100 : 0;
+
+    // Update Eye State
+    if (scrollY > 10) {
+      hasScrolledOnce = true;
+    } else if (scrollY === 0) {
+      /* Reset if at very top */
+      hasScrolledOnce = false;
+    }
+
+    // Scale eye gradually based on scroll progress (1.0 -> 1.5)
+    eyeScale = 1 + (scrollProgress / 100) * 0.5;
+
+    // Determine Evolution Stage based on scroll
+    if (scrollProgress < 25) {
+      eyeStage = 1; // 1 Tomoe
+      eyeVariant = "sasuke";
+    } else if (scrollProgress < 50) {
+      eyeStage = 2; // 2 Tomoe
+      eyeVariant = "sasuke";
+    } else if (scrollProgress < 75) {
+      eyeStage = 3; // 3 Tomoe
+      eyeVariant = "sasuke";
+    } else if (scrollProgress < 90) {
+      eyeStage = 4; // Mangekyou
+      eyeVariant = "sasuke";
+    } else {
+      eyeStage = 4; // Rinne Sharingan (technically a variant of Mangekyou stage in this component logic)
+      eyeVariant = "sasuke-rinne";
+    }
   }
 
   onMount(() => {
@@ -78,16 +113,29 @@
   <!-- Scroll Progress Indicator - Chakra Flow Line -->
   <div class="scroll-progress" aria-hidden="true">
     <div class="progress-fill" style="width: {scrollProgress}%"></div>
-    <div class="progress-glow" style="left: {scrollProgress}%"></div>
-  </div>
 
-  <!-- Persistent Eye Indicator -->
-  <div class="eye-indicator" class:scrolled>
-    <SharinganEye size={scrolled ? 32 : 40} variant="sasuke" />
+    <!-- Sharingan Eye as Progress Head/Logo/Merged Entity -->
+    <div
+      class="eye-progress-indicator"
+      class:at-navbar={!hasScrolledOnce}
+      class:at-progress={hasScrolledOnce && scrollProgress <= 95}
+      class:merging={scrollProgress > 95}
+      style="--raw-progress: {scrollProgress}; --eye-scale: {eyeScale};"
+    >
+      <SharinganEye
+        size={32}
+        variant={eyeVariant}
+        stage={eyeStage}
+        triggerActivation={scrollProgress > 90 && eyeVariant === "sasuke-rinne"}
+      />
+    </div>
   </div>
 
   <!-- Desktop Navigation -->
   <ul class="nav-list desktop">
+    <!-- Spacer for the Fixed Eye Logo -->
+    <li class="nav-logo-spacer" aria-hidden="true"></li>
+
     {#each navItems as item, index}
       <li>
         <button
@@ -197,6 +245,14 @@
     padding: 1rem 2rem;
     background: transparent;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Define logo offset for consistent positioning */
+    --logo-offset: 3.75rem;
+  }
+
+  @media (max-width: 768px) {
+    .ninja-nav {
+      --logo-offset: 2.5rem;
+    }
   }
 
   .ninja-nav.scrolled {
@@ -221,12 +277,20 @@
     left: 0;
     right: 0;
     height: 2px;
-    background: rgba(255, 255, 255, 0.05);
+    background: transparent; /* hidden track */
     overflow: visible;
   }
 
   .progress-fill {
+    position: absolute;
     height: 100%;
+    /* Fill starts from the very left edge (0) */
+    left: 0;
+    /* Width extends to the eye's position (offset + remaining distance * progress) */
+    width: calc(
+      var(--logo-offset) + (100vw - var(--logo-offset)) *
+        (var(--raw-progress) / 100)
+    );
     background: linear-gradient(
       90deg,
       var(--sharingan-red) 0%,
@@ -235,27 +299,68 @@
     transition: width 0.1s linear;
   }
 
-  .progress-glow {
-    position: absolute;
-    top: -4px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--sharingan-red);
-    box-shadow:
-      0 0 10px var(--sharingan-red),
-      0 0 20px var(--sharingan-red-glow);
-    transform: translateX(-50%);
-    transition: left 0.1s linear;
+  /* Eye Progress Indicator - Global Fixed Position Tracker */
+  .eye-progress-indicator {
+    position: fixed; /* Fixed allows smooth transition between layout states */
+    z-index: 2000;
+    pointer-events: none;
+    transition:
+      top 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+      /* Slower for "good animation" */ left 0.1s linear,
+      transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.6s ease 0.2s; /* Slight delay on opacity for merge */
   }
 
-  .eye-indicator {
-    flex-shrink: 0;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  /* State 1: Navbar "Logo" Position */
+  .eye-progress-indicator.at-navbar {
+    top: 2.25rem; /* Vertically centered */
+    left: var(--logo-offset);
+    transform: translate(-50%, -50%) scale(1.25);
   }
 
-  .eye-indicator.scrolled {
-    transform: scale(0.85);
+  /* Mobile adjustment for Navbar position */
+  @media (max-width: 768px) {
+    .eye-progress-indicator.at-navbar {
+      top: 2.25rem;
+      /* left handled by var(--logo-offset) update in .ninja-nav query */
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  /* State 2: Progress Bar Head Position */
+  .eye-progress-indicator.at-progress {
+    /* Top is navbar height (approx) + progress position */
+    top: calc(
+      100% - 2px
+    ); /* Relative to parent if absolute, but we are fixed now */
+    /* Since we are fixed, we need to know the navbar height. 
+       Standard nav is ~padding 1rem top/bottom + content. 
+       Let's drop it to just below the navbar glass */
+    top: calc(3.5rem + 15px);
+
+    /* Start from logo position and travel to end of screen */
+    left: calc(
+      var(--logo-offset) + (100vw - var(--logo-offset)) *
+        (var(--raw-progress) / 100)
+    );
+
+    transform: translate(-50%, -50%) scale(var(--eye-scale));
+  }
+
+  /* Mobile adjustment for Progress position */
+  @media (max-width: 768px) {
+    .eye-progress-indicator.at-progress {
+      top: calc(3rem + 10px);
+    }
+  }
+
+  /* State 3: Merging (Center Screen) Position */
+  .eye-progress-indicator.merging {
+    top: 50vh !important;
+    left: 50vw !important;
+    transform: translate(-50%, -50%) scale(0); /* Shrink into the void */
+    opacity: 0;
+    filter: drop-shadow(0 0 20px var(--rinnegan-purple));
   }
 
   .nav-list {
@@ -265,6 +370,15 @@
     gap: 0;
     margin: 0;
     padding: 0;
+    width: 100%; /* Ensure list takes full width for proper spacing */
+  }
+
+  /* Spacer to reserve room for the logo */
+  .nav-logo-spacer {
+    width: 60px; /* Width of eye (32-40px) + margins */
+    height: 40px;
+    margin-right: auto; /* Push other items to the right/center if needed, or just let gap handle it */
+    flex-shrink: 0;
   }
 
   .nav-list.desktop {

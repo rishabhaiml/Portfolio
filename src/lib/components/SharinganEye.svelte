@@ -26,6 +26,8 @@
     | "pain"
     | "gaara" = "itachi";
 
+  export let stage: number | null = null;
+
   // Trigger activation animation externally
   export let triggerActivation: boolean = false;
 
@@ -42,11 +44,13 @@
 
   // Effective evolution level
   $: effectiveEvolution =
-    forceCharacterEye || isCharacterEye
-      ? 6
-      : forceMangekyou
-        ? 4
-        : $eyeEvolution;
+    stage !== null
+      ? stage
+      : forceCharacterEye || isCharacterEye
+        ? 6
+        : forceMangekyou
+          ? 4
+          : $eyeEvolution;
 
   // Character-specific activation configs
   const activationConfigs: Record<
