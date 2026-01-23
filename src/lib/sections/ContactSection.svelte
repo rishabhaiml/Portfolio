@@ -41,7 +41,11 @@
   <div class="container">
     <div class="contact-content">
       <!-- Large Rinnegan Display -->
-      <div class="rinnegan-display" class:visible={isVisible}>
+      <div
+        id="rinnegan-merge-target"
+        class="rinnegan-display"
+        class:visible={isVisible}
+      >
         <SharinganEye
           variant="sasuke-rinne"
           forceMangekyou={true}

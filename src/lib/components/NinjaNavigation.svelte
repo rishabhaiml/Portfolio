@@ -25,6 +25,26 @@
   let eyeVariant: "sasuke" | "sasuke-rinne" = "sasuke";
   let hasScrolledOnce = false;
 
+  // Merge Target Tracking
+  let targetTop = 0;
+  let targetLeft = 0;
+
+  function updateMergeTarget() {
+    if (scrollProgress > 90) {
+      const target = document.getElementById("rinnegan-merge-target");
+      if (target) {
+        const rect = target.getBoundingClientRect();
+        targetTop = rect.top + rect.height / 2;
+        targetLeft = rect.left + rect.width / 2;
+      }
+      requestAnimationFrame(updateMergeTarget);
+    }
+  }
+
+  $: if (scrollProgress > 90) {
+    updateMergeTarget();
+  }
+
   const navItems = [
     { name: "Home", section: 0 },
     { name: "Skills", section: 1 },
@@ -124,7 +144,7 @@
       class:at-navbar={!hasScrolledOnce}
       class:at-progress={hasScrolledOnce && scrollProgress <= 95}
       class:merging={scrollProgress > 95}
-      style="--raw-progress: {scrollProgress}; --eye-scale: {eyeScale};"
+      style="--raw-progress: {scrollProgress}; --eye-scale: {eyeScale}; --target-top: {targetTop}px; --target-left: {targetLeft}px;"
     >
       <SharinganEye
         size={32}
@@ -310,6 +330,7 @@
     position: fixed; /* Fixed allows smooth transition between layout states */
     z-index: 2000;
     pointer-events: none;
+    will-change: transform, top, left, opacity; /* Performance optimization */
     transition:
       top 0.8s cubic-bezier(0.16, 1, 0.3, 1),
       /* Slower for "good animation" */ left 0.1s linear,
@@ -363,13 +384,14 @@
     }
   }
 
-  /* State 3: Merging (Center Screen) Position */
+  /* State 3: Merging (Dynamic Target) Position */
   .eye-progress-indicator.merging {
-    top: 50vh !important;
-    left: 50vw !important;
-    transform: translate(-50%, -50%) scale(0); /* Shrink into the void */
+    top: var(--target-top) !important;
+    left: var(--target-left) !important;
+    /* Scale from 32px to match the 200px Rinnegan in ContactSection (~6.25x) */
+    transform: translate(-50%, -50%) scale(6);
     opacity: 0;
-    filter: drop-shadow(0 0 20px var(--rinnegan-purple));
+    filter: drop-shadow(0 0 30px var(--rinnegan-purple));
   }
 
   .nav-list {

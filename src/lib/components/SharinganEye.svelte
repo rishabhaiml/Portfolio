@@ -460,9 +460,9 @@
     >
       <defs>
         <radialGradient id="mangekyouIris">
-          <stop offset="0%" stop-color="#ff0000" />
-          <stop offset="50%" stop-color="#E63946" />
-          <stop offset="100%" stop-color="#8B0000" />
+          <stop offset="0" style="stop-color:#660000; stop-opacity: 1;" />
+          <stop style="stop-color:#c30000; stop-opacity: 1;" offset="0.6" />
+          <stop style="stop-color:#a00000; stop-opacity: 1;" offset="1" />
         </radialGradient>
         <filter id="mangekyouGlow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="3" result="coloredBlur" />
