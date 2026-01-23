@@ -13,6 +13,9 @@
     soundEnabled,
   } from "$lib/stores";
   import SharinganEye from "./SharinganEye.svelte";
+  import uchihaClanIcon from "$lib/assets/uchiha_clan.svg";
+  import { slide, fade } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
 
   let isMenuOpen = false;
   let scrolled = false;
@@ -197,9 +200,9 @@
     {/each}
   </ul>
 
-  <!-- Sound Toggle (Creative Mute) -->
+  <!-- Sound Toggle (Creative Mute) - Desktop Only -->
   <button
-    class="sound-toggle"
+    class="sound-toggle desktop-only"
     class:muted={!$soundEnabled}
     on:click={() => soundEnabled.update((v) => !v)}
     aria-label={$soundEnabled ? "Mute audio" : "Enable audio"}
@@ -229,30 +232,87 @@
     aria-expanded={isMenuOpen}
     aria-label="Toggle navigation menu"
   >
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
+    <img
+      src={uchihaClanIcon}
+      alt="Uchiha Clan Symbol"
+      class="uchiha-symbol-icon"
+      width="28"
+      height="34"
+    />
   </button>
 
   <!-- Mobile Navigation -->
   {#if isMenuOpen}
-    <div class="mobile-nav" role="menu">
+    <div
+      class="mobile-nav"
+      role="menu"
+      transition:slide={{ duration: 400, easing: cubicOut }}
+    >
+      <!-- Unrolling Scroll Handles -->
+      <div
+        class="scroll-handle scroll-handle-top"
+        in:fade={{ delay: 100 }}
+      ></div>
+      <div
+        class="scroll-handle scroll-handle-bottom"
+        in:fade={{ delay: 100 }}
+      ></div>
+
       <ul class="nav-list mobile">
         {#each navItems as item}
           <li>
             <button
-              class="nav-item"
+              class="nav-item mobile-item"
               class:active={$currentSection === item.section}
               on:click={() => navigateTo(item.section)}
               role="menuitem"
             >
               <span class="nav-label">{item.name}</span>
               {#if $currentSection === item.section}
-                <span class="mobile-indicator"></span>
+                <!-- Jutsu Seal / Tomoe Indicator for active state -->
+                <span class="mobile-indicator tomoe-icon">
+                  <svg viewBox="0 0 20 20" width="12" height="12">
+                    <circle cx="10" cy="10" r="4" fill="currentColor" />
+                    <path
+                      d="M10 6 C12.2 6 14 7.8 14 10 C14 12.2 12.2 14 10 14 C7.8 14 6 12.2 6 10 C6 7.8 7.8 6 10 6 Z"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1"
+                      opacity="0.5"
+                    />
+                  </svg>
+                </span>
               {/if}
             </button>
           </li>
         {/each}
+
+        <!-- Mobile Sound Toggle -->
+        <li class="mobile-sound-wrapper">
+          <button
+            class="nav-item mobile-item sound-item"
+            class:muted={!$soundEnabled}
+            on:click={() => soundEnabled.update((v) => !v)}
+          >
+            <span class="nav-label">
+              {$soundEnabled ? "Sound On" : "Sound Off"}
+            </span>
+            <div class="sound-icon-wrapper">
+              <svg
+                viewBox="0 0 24 24"
+                class="note-svg"
+                width="16"
+                height="16"
+                aria-hidden="true"
+              >
+                <path
+                  fill="currentColor"
+                  d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"
+                />
+              </svg>
+            </div>
+          </button>
+        </li>
       </ul>
     </div>
   {/if}
@@ -356,15 +416,22 @@
 
   /* State 2: Progress Bar Head Position */
   .eye-progress-indicator.at-progress {
-    /* Smoother vertical transition: 
-       Start at 36px (logo pos) and slide to progress pos (3.5rem + 15px = ~71px) 
-       over first 10% of scroll progress */
+    /* 
+       Vertical Transition:
+       - Initial (at navbar): top = 2.25rem (36px) [Center of 1rem + 40px + 1rem navbar]
+       - Scrolled (at progress): top = ~64px (4rem) [Bottom of 0.75rem + 40px + 0.75rem navbar]
+       
+       We want it at the EXACT bottom line. 
+       Measurement shows navbar bottom line is at ~73px.
+       
+       We transition from 36px to 73px over the first 0-10% of scroll.
+    */
     top: calc(
       2.25rem +
         clamp(
-          0rem,
-          (var(--raw-progress) / 10) * (3.5rem + 15px - 2.25rem),
-          3.5rem + 15px - 2.25rem
+          0px,
+          (var(--raw-progress) / 10) * (73px - 2.25rem),
+          73px - 2.25rem
         )
     );
 
@@ -380,7 +447,16 @@
   /* Mobile adjustment for Progress position */
   @media (max-width: 768px) {
     .eye-progress-indicator.at-progress {
-      top: calc(3rem + 10px);
+      /* Mobile Scrolled Navbar: roughly same height, or slightly different? 
+         Let's assume standard behavior. If padding is same, height is same. */
+      top: calc(
+        2.25rem +
+          clamp(
+            0px,
+            (var(--raw-progress) / 10) * (73px - 2.25rem),
+            73px - 2.25rem
+          )
+      );
     }
   }
 
@@ -556,81 +632,133 @@
   /* Mobile menu toggle */
   .menu-toggle {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
-    padding: 10px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
     background: transparent;
     border: none;
     cursor: pointer;
-  }
-
-  .toggle-line {
-    width: 24px;
-    height: 2px;
-    background: var(--text-primary);
-    border-radius: 2px;
     transition: all 0.3s ease;
+    /* Ensure strict right alignment in the flex container */
+    margin-left: auto;
   }
 
-  .menu-toggle.open .toggle-line:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
+  .uchiha-symbol-icon {
+    filter: drop-shadow(0 0 5px rgba(226, 9, 9, 0.3));
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .menu-toggle.open .toggle-line:nth-child(2) {
-    opacity: 0;
+  .menu-toggle:hover .uchiha-symbol-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 10px rgba(226, 9, 9, 0.6));
   }
 
-  .menu-toggle.open .toggle-line:nth-child(3) {
-    transform: rotate(-45deg) translate(5px, -5px);
+  .menu-toggle.open .uchiha-symbol-icon {
+    transform: rotate(360deg) scale(0.9);
+    filter: drop-shadow(0 0 15px var(--sharingan-red));
   }
 
-  /* Mobile navigation */
+  /* Mobile navigation - Ninja Scroll Theme (Optimized + Animated) */
   .mobile-nav {
     position: fixed;
     top: 60px;
-    left: 0;
-    right: 0;
-    background: rgba(10, 10, 10, 0.98);
-    backdrop-filter: blur(20px);
-    padding: 1rem;
-    border-bottom: 1px solid rgba(230, 57, 70, 0.2);
-    animation: slideDown 0.3s ease;
+    left: 1rem;
+    right: 1rem;
+    background: rgba(15, 5, 5, 0.96);
+    padding: 1.5rem;
+    border: 1px solid rgba(230, 57, 70, 0.3);
+    border-top: 2px solid var(--sharingan-red);
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+    z-index: 999;
+    overflow: hidden; /* Critical for slide transition */
   }
 
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  /* Decorative Scroll Handles */
+  .scroll-handle {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background: linear-gradient(
+      90deg,
+      #4a1a1a 0%,
+      #8b0000 20%,
+      #e63946 50%,
+      #8b0000 80%,
+      #4a1a1a 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    z-index: 1002;
   }
+
+  .scroll-handle-top {
+    top: 0;
+    border-radius: 4px 4px 0 0;
+  }
+
+  .scroll-handle-bottom {
+    bottom: 0px;
+    border-radius: 0 0 4px 4px;
+  }
+
+  /* Remove individual unrollScroll animation as slide handle transition */
 
   .nav-list.mobile {
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.5rem;
   }
 
   .nav-list.mobile .nav-item {
     width: 100%;
     justify-content: space-between;
-    padding: 0.75rem 1rem;
+    padding: 0.85rem 1.25rem;
     border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .nav-list.mobile .nav-item:active {
+    transform: scale(0.98);
   }
 
   .nav-list.mobile .nav-item.active {
-    background: rgba(230, 57, 70, 0.1);
-    border-left: 3px solid var(--sharingan-red);
+    background: rgba(230, 57, 70, 0.15);
+    border-color: rgba(230, 57, 70, 0.4);
+    box-shadow: inset 0 0 15px rgba(230, 57, 70, 0.1);
   }
 
-  .mobile-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--sharingan-red);
-    box-shadow: 0 0 10px var(--sharingan-red-glow);
+  .mobile-indicator.tomoe-icon {
+    display: flex;
+    align-items: center;
+    color: var(--sharingan-red);
+    animation: spinSlow 8s linear infinite;
+  }
+
+  @keyframes spinSlow {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .mobile-sound-wrapper {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .nav-item.mobile-item.sound-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-secondary);
+  }
+
+  .nav-item.mobile-item.sound-item.muted {
+    color: var(--text-muted);
+    opacity: 0.7;
   }
 
   /* Sound Toggle Styles */
@@ -647,6 +775,13 @@
     margin-right: 0.5rem;
     transition: all 0.3s ease;
     z-index: 1001;
+  }
+
+  /* Hide header sound toggle on mobile */
+  @media (max-width: 768px) {
+    .sound-toggle.desktop-only {
+      display: none;
+    }
   }
 
   @media (min-width: 768px) {
