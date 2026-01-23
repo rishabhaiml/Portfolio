@@ -425,24 +425,26 @@
             <circle style="fill:#000;" cx="150" cy="150" r="25" />
           </g>
         {:else}
-          {#each Array(effectiveEvolution) as _, i}
-            <!-- Generic 1-tomoe generation (keeps existing logic for stage 1) -->
-            {@const angleDeg = i * (360 / effectiveEvolution)}
-            {@const angleRad = (angleDeg * Math.PI) / 180}
-            {@const radius = 45}
-            {@const x = 100 + radius * Math.sin(angleRad)}
-            {@const y = 100 - radius * Math.cos(angleRad)}
-            {@const rotationToCenter = angleDeg + 180}
-            <g transform="translate({x}, {y}) rotate({rotationToCenter}, 0, 0)">
-              <g transform="scale(0.39) translate(-60, -150)">
-                <circle cx="60" cy="150" r="20" fill="#000000" />
-                <path
-                  d="M 60,170 59.4,152.9 C 43.9,152.9 28.7,154.1 18.8,133.3 22.4,156 32.8,170 60,170 Z"
-                  fill="#000000"
-                />
-              </g>
+          <!-- User's exact 1-tomoe SVG scaled (0.66x) -->
+          <g transform="translate(100, 100) scale(0.66) translate(-150, -150)">
+            <!-- Inner ring -->
+            <circle
+              style="fill:none; stroke:#000000; stroke-width:4;stroke-opacity:0.3"
+              cx="150"
+              cy="150"
+              r="90"
+            />
+            <!-- Tomoe 1 -->
+            <g id="tomoe1-1" transform="rotate(120 150 150)">
+              <circle style="fill:#000;" cx="60" cy="150" r="20" />
+              <path
+                style="fill:#000;"
+                d="M 60,170 59.4,152.9 C 43.9,152.9 28.7,154.1 18.8,133.3 22.4,156 32.8,170 60,170 z"
+              />
             </g>
-          {/each}
+            <!-- Center pupil -->
+            <circle style="fill:#000;" cx="150" cy="150" r="25" />
+          </g>
         {/if}
       </g>
 
