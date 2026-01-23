@@ -140,7 +140,12 @@
 
     // Subtitle State
     let currentSubtitle = "";
-    import { fade } from "svelte/transition";
+    import { fade, fly } from "svelte/transition";
+    let auraIntensity = 1; // 1 = base, >1 = speaking
+
+    $: auraIntensity = currentSubtitle
+        ? 1 + Math.min(currentSubtitle.length / 50, 0.5)
+        : 1;
 
     // Mouse tracking state
     let containerRef: HTMLDivElement;
@@ -423,18 +428,28 @@
             if (!containerRef) return;
             containerRect = containerRef.getBoundingClientRect();
 
-            // Calculate scale to fit the 600px design within the container
-            const DESIGN_SIZE = 600;
-            const PADDING_FACTOR = 0.9; // 10% breathing room
+            const isMobile = window.innerWidth <= 768;
+
+            // On mobile, treat the "design size" as smaller (zooming in the 600px content)
+            // and ignore height constraints to ensure it fills width
+            const DESIGN_SIZE = isMobile ? 360 : 600;
+            const PADDING_FACTOR = isMobile ? 0.95 : 0.9;
 
             const availableWidth = containerRect.width;
             const availableHeight = containerRect.height;
 
-            const scale = Math.min(
-                (availableWidth / DESIGN_SIZE) * PADDING_FACTOR,
-                (availableHeight / DESIGN_SIZE) * PADDING_FACTOR,
-                1, // Max scale 1
-            );
+            let scale;
+            if (isMobile) {
+                // Width-based scaling mostly, allow slight overflow
+                scale = (availableWidth / DESIGN_SIZE) * PADDING_FACTOR;
+            } else {
+                // Strict contain for desktop
+                scale = Math.min(
+                    (availableWidth / DESIGN_SIZE) * PADDING_FACTOR,
+                    (availableHeight / DESIGN_SIZE) * PADDING_FACTOR,
+                    1,
+                );
+            }
 
             containerRef.style.setProperty("--gallery-scale", scale.toString());
         };
@@ -614,6 +629,7 @@
                 tabindex="0"
                 role="button"
                 aria-label="Click to cycle Mangekyou variant. Current: {centerVariant}"
+                style="--aura-intensity: {auraIntensity};"
             >
                 <SharinganEye
                     size={CENTER_SIZE}
@@ -626,24 +642,26 @@
 
             <!-- Center label - Creative AI/ML Engineer Title or Subtitles -->
             <!-- Center label - Subtitles ONLY -->
+            <!-- Center label - Subtitles ONLY -->
             <div class="center-title">
-                <span class="title-decorator">⟨</span>
                 <span class="center-label">
                     {#key centerVariant}
                         <!-- Force re-render on character change -->
                         {#if currentSubtitle}
-                            <span
-                                class="subtitle-text"
-                                in:fade={{ duration: 150 }}
-                                >{currentSubtitle}</span
+                            <div
+                                class="subtitle-text-wrapper"
+                                in:fly={{ y: 20, duration: 400 }}
                             >
+                                <span class="subtitle-text"
+                                    >{currentSubtitle}</span
+                                >
+                            </div>
                         {:else}
                             <!-- Empty placeholder to maintain height/layout -->
                             <span class="subtitle-placeholder">&nbsp;</span>
                         {/if}
                     {/key}
                 </span>
-                <span class="title-decorator">⟩</span>
             </div>
         </div>
     </div>
@@ -803,15 +821,26 @@
 
     .mangekyou-container {
         cursor: pointer;
+        /* Default shadow - will be overridden by specific rule below to allow calc */
         filter: drop-shadow(0 0 30px rgba(230, 57, 70, 0.5));
         transition:
-            filter 0.3s ease,
+            filter 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
             transform 0.2s ease;
         border-radius: 50%;
     }
 
+    /* Reactive Aura Pulse */
+    .mangekyou-container {
+        filter: drop-shadow(
+            0 0 calc(30px * var(--aura-intensity, 1)) rgba(230, 57, 70, 0.5)
+        );
+    }
+
     .mangekyou-container:hover {
-        filter: drop-shadow(0 0 50px rgba(230, 57, 70, 0.8));
+        /* Boost aura on hover regardless of speech */
+        filter: drop-shadow(
+            0 0 calc(50px * var(--aura-intensity, 1)) rgba(230, 57, 70, 0.8)
+        );
         transform: scale(1.05);
     }
 
@@ -841,32 +870,22 @@
         }
     }
 
-    /* Creative Center Title - Cinematic Subtitles */
+    /* Floating Chakra Subtitles */
     .center-title {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        /* Cinematic Bar Style */
-        background: linear-gradient(
-            90deg,
-            rgba(0, 0, 0, 0) 0%,
-            rgba(0, 0, 0, 0.8) 20%,
-            rgba(0, 0, 0, 0.8) 80%,
-            rgba(0, 0, 0, 0) 100%
+        padding: 1rem;
+        /* Ghostly radial gradient instead of bar */
+        background: radial-gradient(
+            ellipse at center,
+            rgba(0, 0, 0, 0.7) 0%,
+            transparent 70%
         );
-        border-radius: 0;
-        border: none;
-        backdrop-filter: blur(2px);
-        min-width: 300px; /* Ensure wide enough for text */
+        min-width: 300px;
         justify-content: center;
-    }
-
-    .title-decorator {
-        font-size: 1.2rem;
-        font-weight: 300;
-        color: rgba(255, 255, 255, 0.3); /* Subtle decorator */
-        opacity: 0.5;
+        margin-top: 1rem; /* Space from eye */
+        pointer-events: none; /* Let clicks pass through to eye */
     }
 
     .center-label {
@@ -874,30 +893,31 @@
         flex-direction: column;
         align-items: center;
         line-height: 1.4;
-        min-height: 60px; /* Pre-allocate space */
+        min-height: 80px;
         justify-content: center;
         width: 100%;
-        gap: 0.1rem;
+    }
+
+    .subtitle-text-wrapper {
+        display: flex;
+        justify-content: center;
     }
 
     .subtitle-text {
-        font-family: var(--font-heading); /* Or 'Jost' if available */
-        font-size: 1.25rem;
-        font-weight: 600;
-        /* Cinematic Text Gradient */
-        background: linear-gradient(
-            180deg,
-            #ffffff 0%,
-            #f0f0f0 50%,
-            #d4d4d4 100%
-        );
+        font-family: var(--font-heading);
+        font-size: 1.35rem; /* Larger, more impactful */
+        font-weight: 700;
+        /* Dynamic Chakra Gradient */
+        background: linear-gradient(180deg, #fff 10%, #ffaaaa 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
         text-align: center;
-        max-width: 400px;
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+        max-width: 450px;
+        /* Strong glow for readability */
+        filter: drop-shadow(0 0 10px rgba(230, 57, 70, 0.5));
         letter-spacing: 0.05em;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
     }
 
     .subtitle-placeholder {
@@ -934,28 +954,27 @@
                 )
                 scale(var(--depth));
         }
-
-        .title-decorator {
-            font-size: 1rem;
-        }
     }
 
     /* Mobile */
     @media (max-width: 768px) {
         .uchiha-gallery {
-            min-height: 300px;
+            min-height: 60vh;
+            width: 100vw;
+            overflow: visible;
         }
 
         .parallax-container {
-            --gallery-scale: 0.7;
-            width: min(400px, 90vw);
-            height: min(400px, 90vw);
+            --gallery-scale: 0.85;
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
         }
 
         .orbital-eye {
             transform: translate(
-                    calc(-50% + var(--x) * 0.7),
-                    calc(-50% + var(--y) * 0.7)
+                    calc(-50% + var(--x) * var(--gallery-scale)),
+                    calc(-50% + var(--y) * var(--gallery-scale))
                 )
                 scale(var(--depth));
         }
@@ -964,45 +983,44 @@
             padding: 0.4rem 0.8rem;
             gap: 0.3rem;
             min-width: auto;
-            width: 100%;
+            width: 90%;
+            bottom: 10%;
         }
 
         .subtitle-text {
-            font-size: 1rem;
-            max-width: 250px;
-        }
-
-        .title-decorator {
-            font-size: 0.9rem;
+            font-size: 1.6rem;
+            max-width: 90vw;
+            line-height: 1.3;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
         }
 
         .eye-tooltip {
-            display: none; /* Hide tooltips on mobile */
+            display: none;
         }
     }
 
     /* Small mobile */
     @media (max-width: 480px) {
         .uchiha-gallery {
-            min-height: 250px;
+            min-height: 50vh;
         }
 
         .parallax-container {
-            --gallery-scale: 0.55;
-            width: min(320px, 95vw);
-            height: min(320px, 95vw);
+            --gallery-scale: 0.75;
+            min-height: 350px;
         }
 
         .orbital-eye {
             transform: translate(
-                    calc(-50% + var(--x) * 0.55),
-                    calc(-50% + var(--y) * 0.55)
+                    calc(-50% + var(--x) * var(--gallery-scale)),
+                    calc(-50% + var(--y) * var(--gallery-scale))
                 )
                 scale(var(--depth));
         }
 
         .subtitle-text {
-            font-size: 0.85rem;
+            font-size: 1.4rem;
+            max-width: 95vw;
         }
 
         .center-label {
