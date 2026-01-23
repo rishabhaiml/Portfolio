@@ -309,16 +309,9 @@
       <defs>
         <!-- Anime-accurate iris gradient -->
         <radialGradient id="sharinganIris">
-          {#if effectiveEvolution === 2 || effectiveEvolution === 3}
-            <!-- User's specific gradient for 2 and 3 tomoe -->
-            <stop offset="0" style="stop-color:#660000; stop-opacity: 1;" />
-            <stop style="stop-color:#c30000; stop-opacity: 1;" offset="0.6" />
-            <stop style="stop-color:#a00000; stop-opacity: 1;" offset="1" />
-          {:else}
-            <stop offset="0%" stop-color="#ff4444" />
-            <stop offset="50%" stop-color="#E63946" />
-            <stop offset="100%" stop-color="#cc0000" />
-          {/if}
+          <stop offset="0" style="stop-color:#660000; stop-opacity: 1;" />
+          <stop style="stop-color:#c30000; stop-opacity: 1;" offset="0.6" />
+          <stop style="stop-color:#a00000; stop-opacity: 1;" offset="1" />
         </radialGradient>
         <!-- Red glow filter -->
         <filter id="redGlow" x="-50%" y="-50%" width="200%" height="200%">
