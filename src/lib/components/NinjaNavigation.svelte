@@ -162,8 +162,8 @@
 
   <!-- Desktop Navigation -->
   <ul class="nav-list desktop">
-    <!-- Spacer for the Fixed Eye Logo -->
-    <li class="nav-logo-spacer" aria-hidden="true"></li>
+    <!-- Spacer in the center list is removed to allow pure centering -->
+    <!-- <li class="nav-logo-spacer" aria-hidden="true"></li> -->
 
     {#each navItems as item, index}
       <li>
@@ -200,29 +200,34 @@
     {/each}
   </ul>
 
-  <!-- Sound Toggle (Creative Mute) - Desktop Only -->
-  <button
-    class="sound-toggle desktop-only"
-    class:muted={!$soundEnabled}
-    on:click={() => soundEnabled.update((v) => !v)}
-    aria-label={$soundEnabled ? "Mute audio" : "Enable audio"}
-    title={$soundEnabled ? "Mute" : "Unmute"}
-  >
-    <div class="sound-icon-wrapper">
-      <svg
-        viewBox="0 0 24 24"
-        class="note-svg"
-        width="20"
-        height="20"
-        aria-hidden="true"
-      >
-        <path
-          fill="currentColor"
-          d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"
-        />
-      </svg>
-    </div>
-  </button>
+  <!-- End of Center Column -->
+
+  <!-- Right Column: Sound Toggle & Mobile Menu Toggle -->
+  <div class="nav-right">
+    <!-- Sound Toggle (Creative Mute) - Desktop Only -->
+    <button
+      class="sound-toggle desktop-only"
+      class:muted={!$soundEnabled}
+      on:click={() => soundEnabled.update((v) => !v)}
+      aria-label={$soundEnabled ? "Mute audio" : "Enable audio"}
+      title={$soundEnabled ? "Mute" : "Unmute"}
+    >
+      <div class="sound-icon-wrapper">
+        <svg
+          viewBox="0 0 24 24"
+          class="note-svg"
+          width="20"
+          height="20"
+          aria-hidden="true"
+        >
+          <path
+            fill="currentColor"
+            d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"
+          />
+        </svg>
+      </div>
+    </button>
+  </div>
 
   <!-- Mobile Menu Toggle -->
   <button
@@ -332,12 +337,15 @@
     background: transparent;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     /* Define logo offset for consistent positioning */
-    --logo-offset: 3.75rem;
+    /* Desktop: Padding 2rem (32px) + Toggle Center (~20px) = ~52px */
+    --logo-offset: 3.25rem;
   }
 
   @media (max-width: 768px) {
     .ninja-nav {
-      --logo-offset: 2.5rem;
+      --logo-offset: 46px; /* 2.875rem: Matches right spacing (24px pad + 22px toggle center) */
+      /* Mobile: Standardize padding for better symmetry */
+      padding: 1rem 1.5rem;
     }
   }
 
@@ -353,6 +361,8 @@
     .ninja-nav.scrolled {
       backdrop-filter: blur(4px);
       background: rgba(10, 10, 10, 0.95);
+      /* Force mobile padding to remain 1.5rem on sides for symmetry with offset */
+      padding: 0.75rem 1.5rem;
     }
   }
 
@@ -408,7 +418,7 @@
   /* Mobile adjustment for Navbar position */
   @media (max-width: 768px) {
     .eye-progress-indicator.at-navbar {
-      top: 2.25rem;
+      top: 41px; /* Exact center of 82px header (1rem + 50px + 1rem) */
       /* left handled by var(--logo-offset) update in .ninja-nav query */
       transform: translate(-50%, -50%) scale(1);
     }
@@ -419,19 +429,17 @@
     /* 
        Vertical Transition:
        - Initial (at navbar): top = 2.25rem (36px) [Center of 1rem + 40px + 1rem navbar]
-       - Scrolled (at progress): top = ~64px (4rem) [Bottom of 0.75rem + 40px + 0.75rem navbar]
+       - Scrolled (at progress): top = 4rem (64px) [Bottom of 0.75rem + 40px + 0.75rem navbar]
+         Scrolled navbar height is 24px + 40px = 64px.
        
-       We want it at the EXACT bottom line. 
-       Measurement shows navbar bottom line is at ~73px.
-       
-       We transition from 36px to 73px over the first 0-10% of scroll.
+       We transition from 36px to 64px over the first 0-10% of scroll.
     */
     top: calc(
       2.25rem +
         clamp(
           0px,
-          (var(--raw-progress) / 10) * (73px - 2.25rem),
-          73px - 2.25rem
+          (var(--raw-progress) / 10) * (4rem - 2.25rem),
+          4rem - 2.25rem
         )
     );
 
@@ -447,15 +455,13 @@
   /* Mobile adjustment for Progress position */
   @media (max-width: 768px) {
     .eye-progress-indicator.at-progress {
-      /* Mobile Scrolled Navbar: roughly same height, or slightly different? 
-         Let's assume standard behavior. If padding is same, height is same. */
+      /* Mobile Scrolled Navbar Height:
+         Padding: 0.75rem (12px) * 2 = 24px
+         Icon+Pad: 50px (34px img + 8px*2 pad)
+         Total: 74px */
       top: calc(
-        2.25rem +
-          clamp(
-            0px,
-            (var(--raw-progress) / 10) * (73px - 2.25rem),
-            73px - 2.25rem
-          )
+        41px +
+          clamp(0px, (var(--raw-progress) / 10) * (74px - 41px), 74px - 41px)
       );
     }
   }
@@ -495,6 +501,28 @@
   @media (min-width: 768px) {
     .nav-list.desktop {
       display: flex;
+      flex: 1; /* Take up available space */
+      justify-content: center; /* Center the links strictly */
+    }
+
+    /* Right column wrapper for symmetry */
+    .nav-right {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      /* Match width of the left logo/eye area to ensure center column is perfectly centered */
+      width: var(--logo-offset);
+      min-width: 60px; /* At least 60px */
+    }
+
+    /* Create symmetry by matching the right column's width with a ghost element on the left */
+
+    .ninja-nav::before {
+      content: "";
+      display: block;
+      /* Match nav-right width */
+      width: var(--logo-offset);
+      min-width: 60px;
     }
 
     .menu-toggle {
@@ -639,8 +667,7 @@
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
-    /* Ensure strict right alignment in the flex container */
-    margin-left: auto;
+    /* margin-left: auto; REMOVED, handled by nav-right container */
   }
 
   .uchiha-symbol-icon {
@@ -771,8 +798,7 @@
     color: var(--text-primary);
     cursor: pointer;
     padding: 0.5rem;
-    margin-left: auto;
-    margin-right: 0.5rem;
+    margin: 0; /* Handled by container */
     transition: all 0.3s ease;
     z-index: 1001;
   }
