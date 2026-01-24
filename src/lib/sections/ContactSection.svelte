@@ -400,6 +400,17 @@
     <footer class="portfolio-footer">
       <p>Made by AI (to showcase Rishabh Shukla's Work)</p>
       <p class="footer-ninja">The path of the ninja never ends.</p>
+      <div class="legal-disclaimer">
+        <p>
+          <strong>Disclaimer:</strong> This portfolio is a non-profit, educational
+          project created solely to demonstrate technical skills. All characters,
+          names, audio, and visual assets related to 'Naruto' are identifiers of
+          and copyright to Masashi Kishimoto, Shueisha, Viz Media, and TV Tokyo.
+          No copyright infringement is intended. This project is not affiliated with,
+          endorsed by, or sponsored by the official copyright holders. Usage of these
+          assets falls under 'Fair Use' for educational and transformative purposes.
+        </p>
+      </div>
     </footer>
 
     <!-- Uchiha Clan Symbol Footer -->
@@ -666,6 +677,23 @@
   .footer-ninja {
     font-style: italic;
     opacity: 0.6;
+  }
+
+  .legal-disclaimer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    opacity: 0.5;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.4;
+  }
+
+  .legal-disclaimer:hover {
+    opacity: 0.8;
   }
 
   /* Background effect */
