@@ -13,6 +13,7 @@
     soundEnabled,
   } from "$lib/stores";
   import SharinganEye from "./SharinganEye.svelte";
+  import ChakraActiveIndicator from "./ChakraActiveIndicator.svelte";
   import uchihaClanIcon from "$lib/assets/uchiha_clan.svg";
   import { slide, fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
@@ -174,15 +175,11 @@
           on:click={() => navigateTo(item.section)}
           aria-current={$currentSection === item.section ? "page" : undefined}
         >
-          <span class="nav-label">{item.name}</span>
+          {#if $currentSection === item.section}
+            <ChakraActiveIndicator level={item.section} />
+          {/if}
 
-          <!-- Active indicator - Tomoe style -->
-          <!-- Active indicator - replaced by the "Impulse Box" border style on the button itself -->
-          <!-- {#if $currentSection === item.section}
-            <span class="active-indicator" aria-hidden="true">
-               ... removed ...
-            </span>
-          {/if} -->
+          <span class="nav-label">{item.name}</span>
 
           <!-- Chakra ripple effect -->
           <span class="ripple" aria-hidden="true"></span>
@@ -558,33 +555,11 @@
 
   .nav-item.active {
     color: var(--text-primary);
-    /* Impulse Box Design */
-    border: 1px solid rgba(220, 20, 60, 0.6); /* Red border */
-    background: rgba(220, 20, 60, 0.05); /* Slight tint */
-    box-shadow:
-      0 0 10px rgba(220, 20, 60, 0.3),
-      inset 0 0 10px rgba(220, 20, 60, 0.1);
-    animation: impulsePulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+    /* Active styling is now handled by ChakraActiveIndicator */
   }
 
   /* Remove old active indicator dot styles */
   /* .active-indicator used to be here */
-
-  @keyframes impulsePulse {
-    0%,
-    100% {
-      box-shadow:
-        0 0 5px rgba(220, 20, 60, 0.2),
-        inset 0 0 5px rgba(220, 20, 60, 0.05);
-      border-color: rgba(220, 20, 60, 0.4);
-    }
-    50% {
-      box-shadow:
-        0 0 20px rgba(220, 20, 60, 0.6),
-        inset 0 0 15px rgba(220, 20, 60, 0.3);
-      border-color: rgba(220, 20, 60, 1);
-    }
-  }
 
   .nav-label {
     position: relative;
