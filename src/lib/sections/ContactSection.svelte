@@ -1,3 +1,7 @@
+<script context="module">
+  import { cubicOut } from "svelte/easing";
+</script>
+
 <!--
   CONTACT SECTION
   Final section with Rinnegan theme and contact info
@@ -6,6 +10,8 @@
   import { onMount } from "svelte";
   import { eyeEvolution, currentSection, visitedSections } from "$lib/stores";
   import SharinganEye from "$lib/components/SharinganEye.svelte";
+  import { fade, fly, scale } from "svelte/transition";
+  import { tick } from "svelte";
 
   let sectionRef: HTMLElement;
   let isVisible = false;
@@ -35,6 +41,85 @@
 
     return () => observer.disconnect();
   });
+
+  // Chatbot Logic
+  let isChatOpen = false;
+  let inputValue = "";
+  let isTyping = false;
+  let chatBodyRef: HTMLElement;
+
+  interface Message {
+    id: number;
+    text: string;
+    sender: "user" | "naruto";
+  }
+
+  let messages: Message[] = [
+    {
+      id: 1,
+      text: "Dattebayo! I'm Naruto Uzumaki! What brings you here?",
+      sender: "naruto",
+    },
+  ];
+
+  const narutoQuotes = [
+    "I'm not gonna run away, I never go back on my word! That's my nindo: my ninja way!",
+    "Hard work is worthless for those that don't believe in themselves.",
+    "If you don't like your destiny, don't accept it. Instead, have the courage to change it the way you want it to be!",
+    "I want to be with you. From now on, I want to spend all and every single one of my days until I die with you, and only you, Hinata.",
+    "Hey, you're pretty cool! Make sure to check out Rishabh's projects!",
+    "Believe it!",
+    "Pass me the ramen!",
+  ];
+
+  function toggleChat() {
+    isChatOpen = !isChatOpen;
+    if (isChatOpen) {
+      scrollToBottom();
+    }
+  }
+
+  async function handleSendMessage() {
+    if (!inputValue.trim()) return;
+
+    const userMsg: Message = {
+      id: Date.now(),
+      text: inputValue,
+      sender: "user",
+    };
+
+    messages = [...messages, userMsg];
+    inputValue = "";
+    scrollToBottom();
+
+    // Simulate Naruto typing
+    isTyping = true;
+    setTimeout(async () => {
+      const randomQuote =
+        narutoQuotes[Math.floor(Math.random() * narutoQuotes.length)];
+      const narutoMsg: Message = {
+        id: Date.now() + 1,
+        text: randomQuote,
+        sender: "naruto",
+      };
+      messages = [...messages, narutoMsg];
+      isTyping = false;
+      scrollToBottom();
+    }, 1500);
+  }
+
+  async function scrollToBottom() {
+    await tick();
+    if (chatBodyRef) {
+      chatBodyRef.scrollTop = chatBodyRef.scrollHeight;
+    }
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === "Enter") {
+      handleSendMessage();
+    }
+  }
 </script>
 
 <section id="contact" class="contact section" bind:this={sectionRef}>
@@ -102,6 +187,13 @@
               <span class="card-value">{contactInfo.location}</span>
             </div>
           </div>
+
+          <!-- Talk no Jutsu Button -->
+          <button class="talk-no-jutsu-btn" on:click={toggleChat}>
+            <span class="btn-icon">🍥</span>
+            <span class="btn-text">Talk no Jutsu</span>
+            <span class="btn-sub">Chat with Naruto</span>
+          </button>
         </div>
       </div>
     </div>
@@ -125,6 +217,77 @@
 
   <!-- Background effects -->
   <div class="rinnegan-bg" aria-hidden="true"></div>
+
+  <!-- ChatModal -->
+  {#if isChatOpen}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div
+      class="chat-overlay"
+      transition:fade={{ duration: 200 }}
+      on:click|self={toggleChat}
+      role="button"
+      tabindex="0"
+    >
+      <div
+        class="chat-modal"
+        transition:scale={{
+          duration: 300,
+          start: 0.8,
+          opacity: 0,
+          easing: cubicOut,
+        }}
+        role="dialog"
+      >
+        <header class="chat-header">
+          <div class="naruto-avatar">
+            <span class="avatar-icon">🦊</span>
+          </div>
+          <div class="header-info">
+            <h3>Naruto Uzumaki</h3>
+            <span class="status">Online • Konoha</span>
+          </div>
+          <button
+            class="close-btn"
+            on:click={toggleChat}
+            aria-label="Close chat">×</button
+          >
+        </header>
+
+        <div class="chat-body" bind:this={chatBodyRef}>
+          {#each messages as msg (msg.id)}
+            <div class="message {msg.sender}" in:fly={{ y: 20, duration: 300 }}>
+              <div class="message-content">
+                {msg.text}
+              </div>
+            </div>
+          {/each}
+          {#if isTyping}
+            <div class="message naruto typing">
+              <div class="typing-indicator">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+          {/if}
+        </div>
+
+        <footer class="chat-footer">
+          <input
+            type="text"
+            placeholder="Type a message..."
+            bind:value={inputValue}
+            on:keydown={handleKeydown}
+          />
+          <button
+            class="send-btn"
+            on:click={handleSendMessage}
+            disabled={!inputValue.trim()}
+          >
+            Send
+          </button>
+        </footer>
+      </div>
+    </div>
+  {/if}
 </section>
 
 <style>
@@ -389,5 +552,239 @@
     .card-arrow {
       display: none;
     }
+  }
+
+  /* Talk no Jutsu Button */
+  .talk-no-jutsu-btn {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #ff5500 0%, #ff8800 100%);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 85, 0, 0.3);
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .talk-no-jutsu-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(255, 85, 0, 0.5);
+  }
+
+  .talk-no-jutsu-btn:active {
+    transform: translateY(1px);
+  }
+
+  .btn-icon {
+    font-size: 1.8rem;
+    animation: spin 10s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .btn-text {
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex: 1;
+    text-align: left;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-sub {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    font-weight: 500;
+  }
+
+  /* Chat Modal */
+  .chat-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+  }
+
+  .chat-modal {
+    width: 100%;
+    max-width: 400px;
+    height: 600px;
+    max-height: 80vh;
+    background: #1a1520;
+    border-radius: 20px;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  }
+
+  .chat-header {
+    padding: 1rem;
+    background: rgba(255, 85, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 85, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .naruto-avatar {
+    width: 40px;
+    height: 40px;
+    background: #ff5500;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    border: 2px solid #fff;
+  }
+
+  .header-info h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #fff;
+  }
+
+  .status {
+    font-size: 0.75rem;
+    color: #4ade80; /* Green for online */
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.5rem;
+    margin-left: auto;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .close-btn:hover {
+    color: #fff;
+  }
+
+  .chat-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .message {
+    max-width: 80%;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .message.naruto {
+    align-self: flex-start;
+    background: rgba(255, 85, 0, 0.15);
+    color: #ffdcb5;
+    border-bottom-left-radius: 2px;
+  }
+
+  .message.user {
+    align-self: flex-end;
+    background: rgba(139, 92, 246, 0.3);
+    color: #fff;
+    border-bottom-right-radius: 2px;
+  }
+
+  .typing-indicator span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    animation: typing 1.4s infinite both;
+    margin: 0 2px;
+  }
+
+  .typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes typing {
+    0%,
+    100% {
+      transform: scale(0.2);
+      opacity: 0.2;
+    }
+    50% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .chat-footer {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .chat-footer input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: #fff;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .chat-footer input:focus {
+    border-color: #ff5500;
+  }
+
+  .send-btn {
+    background: #ff5500;
+    color: white;
+    border: none;
+    padding: 0 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .send-btn:hover:not(:disabled) {
+    background: #ff7700;
+  }
+
+  .send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 </style>
