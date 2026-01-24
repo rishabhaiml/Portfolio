@@ -10,8 +10,26 @@
   import { onMount } from "svelte";
   import { eyeEvolution, currentSection, visitedSections } from "$lib/stores";
   import SharinganEye from "$lib/components/SharinganEye.svelte";
-  import { fade, fly, scale } from "svelte/transition";
+  import { fade, fly } from "svelte/transition";
   import { tick } from "svelte";
+  import dattebayoSound from "$lib/assets/dattebayo.mp3";
+
+  // Custom Transition for Scroll Opening
+  function scrollUnroll(
+    node: HTMLElement,
+    { delay = 0, duration = 400, easing = cubicOut },
+  ) {
+    return {
+      delay,
+      duration,
+      easing,
+      css: (t: number) => `
+        transform: scaleY(${t});
+        transform-origin: center;
+        opacity: ${t};
+      `,
+    };
+  }
 
   let sectionRef: HTMLElement;
   let isVisible = false;
@@ -75,8 +93,14 @@
   function toggleChat() {
     isChatOpen = !isChatOpen;
     if (isChatOpen) {
+      playSound();
       scrollToBottom();
     }
+  }
+
+  function playSound() {
+    const audio = new Audio(dattebayoSound);
+    audio.play().catch((e) => console.log("Audio play failed:", e));
   }
 
   async function handleSendMessage() {
@@ -230,10 +254,8 @@
     >
       <div
         class="chat-modal"
-        transition:scale={{
-          duration: 300,
-          start: 0.8,
-          opacity: 0,
+        transition:scrollUnroll={{
+          duration: 400,
           easing: cubicOut,
         }}
         role="dialog"
