@@ -535,7 +535,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.6rem 1rem;
+    padding: 0.6rem 1rem 0.8rem 1rem; /* Added extra bottom padding for the dot */
     background: transparent;
     border: none;
     border-radius: 6px;
@@ -569,7 +569,7 @@
   /* Active indicator - spinning tomoe dot */
   .active-indicator {
     position: absolute;
-    bottom: 4px;
+    bottom: 2px; /* Moved lower to avoid text overlap (was 4px) */
     left: 50%;
     transform: translateX(-50%);
     color: var(--sharingan-red);
