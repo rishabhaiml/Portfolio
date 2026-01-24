@@ -177,13 +177,12 @@
           <span class="nav-label">{item.name}</span>
 
           <!-- Active indicator - Tomoe style -->
-          {#if $currentSection === item.section}
+          <!-- Active indicator - replaced by the "Impulse Box" border style on the button itself -->
+          <!-- {#if $currentSection === item.section}
             <span class="active-indicator" aria-hidden="true">
-              <svg viewBox="0 0 20 20" width="8" height="8">
-                <circle cx="10" cy="10" r="4" fill="currentColor" />
-              </svg>
+               ... removed ...
             </span>
-          {/if}
+          {/if} -->
 
           <!-- Chakra ripple effect -->
           <span class="ripple" aria-hidden="true"></span>
@@ -535,7 +534,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.6rem 1rem 0.8rem 1rem; /* Added extra bottom padding for the dot */
+    padding: 0.6rem 1.25rem; /* Standardized comfortable padding */
     background: transparent;
     border: none;
     border-radius: 6px;
@@ -559,6 +558,32 @@
 
   .nav-item.active {
     color: var(--text-primary);
+    /* Impulse Box Design */
+    border: 1px solid rgba(220, 20, 60, 0.6); /* Red border */
+    background: rgba(220, 20, 60, 0.05); /* Slight tint */
+    box-shadow:
+      0 0 10px rgba(220, 20, 60, 0.3),
+      inset 0 0 10px rgba(220, 20, 60, 0.1);
+    animation: impulsePulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+  }
+
+  /* Remove old active indicator dot styles */
+  /* .active-indicator used to be here */
+
+  @keyframes impulsePulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 5px rgba(220, 20, 60, 0.2),
+        inset 0 0 5px rgba(220, 20, 60, 0.05);
+      border-color: rgba(220, 20, 60, 0.4);
+    }
+    50% {
+      box-shadow:
+        0 0 20px rgba(220, 20, 60, 0.6),
+        inset 0 0 15px rgba(220, 20, 60, 0.3);
+      border-color: rgba(220, 20, 60, 1);
+    }
   }
 
   .nav-label {
@@ -567,26 +592,7 @@
   }
 
   /* Active indicator - spinning tomoe dot */
-  .active-indicator {
-    position: absolute;
-    bottom: 2px; /* Moved lower to avoid text overlap (was 4px) */
-    left: 50%;
-    transform: translateX(-50%);
-    color: var(--sharingan-red);
-    animation: indicatorPulse 2s ease-in-out infinite;
-  }
-
-  @keyframes indicatorPulse {
-    0%,
-    100% {
-      opacity: 1;
-      transform: translateX(-50%) scale(1);
-    }
-    50% {
-      opacity: 0.7;
-      transform: translateX(-50%) scale(1.3);
-    }
-  }
+  /* Removed old indicatorPulse and .active-indicator styles */
 
   /* Connection line between items */
   .nav-connector {
