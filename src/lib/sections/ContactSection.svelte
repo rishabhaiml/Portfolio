@@ -13,6 +13,8 @@
   import { fade, fly } from "svelte/transition";
   import { tick } from "svelte";
   import dattebayoSound from "$lib/assets/dattebayo.mp3";
+  import chakraSound from "$lib/assets/chakra-nature.mp3";
+  import narutoFace from "$lib/assets/naruto-face.png";
 
   // Custom Transition for Scroll Opening
   function scrollUnroll(
@@ -41,6 +43,31 @@
     subject: "Project Inquiry / Collaboration",
     body: "Hi Rishabh,\n\nI was impressed by your portfolio and would like to discuss a potential collaboration.\n\nBest regards,",
   };
+
+  const resumeData = {
+    name: "His full name is Rishabh Bipin Shukla.",
+    summary:
+      "Rishabh Bipin Shukla is a Junior AI/ML Engineer with hands-on experience in deploying production-ready NLP, Speech-to-Text (STT), and Large Language Model (LLM) solutions. He has a strong background in building Retrieval-Augmented Generation (RAG) pipelines and high-performance asynchronous FastAPI backends.",
+    skills:
+      "His technical skills include AI/ML & NLP (Llama 3, Mistral, Phi-3.5, RAG, Whisper, CNNs, RNNs, Embeddings), Frameworks & Libraries (FastAPI Async, PyTorch, Gemini API, Google Text-to-Speech), Backend & Deployment (Docker, REST APIs, AWS Lambda, SQL, Microservices), and Application Development (Flutter, Dart, GetX).",
+    // Granular Experience
+    freelance:
+      "As a Freelance App Developer (Jan 2021 - Mar 2024), Rishabh delivered 15+ production-grade cross-platform mobile apps using Flutter and FastAPI. He deployed containerized backend microservices using Docker and built reactive UIs with GetX state management.",
+
+    // Granular Education
+    ssc: "In his 10th Standard (SSC) [2016-2017], Rishabh scored 83.00%! He showed early brilliance with 96/100 in Mathematics and 96/100 in Science.",
+    hsc: "For his 12th Standard (HSC), he secured 60.92%. Notably, he scored 148/200 in Computer Science, marking the beginning of his ninja path in programming and technology.",
+    bca: "Rishabh completed his Graduation (BCA) from K. P. B. Hinduja College (2019-2022) with a solid CGPA of 8.13/10.0. He built a strong foundation in CS and developed a passion for AI/ML and mobile development.",
+    mca: "He is currently pursuing his Masters (MCA) at MET Institute of Computer Science (2024-2026 Expected). He holds a CGPA of 8.5/10.0 and is working on a Thesis: 'Deep Learning for Real-Time Music Visualization' focusing on audio pattern recognition.",
+
+    // Fallbacks
+    projects:
+      "Some of his key Applied AI Projects include: 1) Deep Learning for Real-Time Music Visualization (MCA Thesis) - using CNNs. 2) Local Privacy-First Knowledge Engine (RAG) - built with Phi-3.5. 3) Charity Suno - Hybrid AI Study Assistant using Gemini API and Google TTS.",
+  };
+
+  function hasAny(text: string, keywords: string[]) {
+    return keywords.some((k) => text.includes(k));
+  }
 
   onMount(() => {
     const observer = new IntersectionObserver(
@@ -75,7 +102,7 @@
   let messages: Message[] = [
     {
       id: 1,
-      text: "Dattebayo! I'm Naruto Uzumaki! What brings you here?",
+      text: "Dattebayo! I'm Naruto Uzumaki! Are you here to uncover the secrets of Rishabh's ninja way? Ask me about his skills, missions, or experience!",
       sender: "naruto",
     },
   ];
@@ -93,22 +120,25 @@
   function toggleChat() {
     isChatOpen = !isChatOpen;
     if (isChatOpen) {
-      playSound();
+      playSound(dattebayoSound);
       scrollToBottom();
+    } else {
+      playSound(chakraSound);
     }
   }
 
-  function playSound() {
-    const audio = new Audio(dattebayoSound);
+  function playSound(soundFile: string) {
+    const audio = new Audio(soundFile);
     audio.play().catch((e) => console.log("Audio play failed:", e));
   }
 
   async function handleSendMessage() {
     if (!inputValue.trim()) return;
 
+    const userText = inputValue.trim();
     const userMsg: Message = {
       id: Date.now(),
-      text: inputValue,
+      text: userText,
       sender: "user",
     };
 
@@ -118,14 +148,158 @@
 
     // Simulate Naruto typing
     isTyping = true;
+
+    // Resume Logic
+    const lowerText = userText.toLowerCase().replace(/[^\w\s]/g, ""); // Remove punctuation for better matching
+    let responseText = "";
+
+    // 1. MCA / Masters / Post Grad
+    if (
+      hasAny(lowerText, [
+        "mca",
+        "master",
+        "post grad",
+        "met institute",
+        "thesis",
+        "pg",
+      ])
+    ) {
+      responseText = resumeData.mca;
+    }
+    // 2. BCA / Graduation / Bachelors
+    else if (
+      hasAny(lowerText, [
+        "bca",
+        "bachelors",
+        "graduation",
+        "undergrad",
+        "degree",
+        "hinduja",
+        "college",
+      ])
+    ) {
+      responseText = resumeData.bca;
+    }
+    // 3. HSC / 12th
+    else if (
+      hasAny(lowerText, [
+        "hsc",
+        "12th",
+        "twelfth",
+        "junior college",
+        "higher secondary",
+        "computer science mark",
+      ])
+    ) {
+      responseText = resumeData.hsc;
+    }
+    // 4. SSC / 10th
+    else if (
+      hasAny(lowerText, [
+        "ssc",
+        "10th",
+        "tenth",
+        "matric",
+        "metric",
+        "school",
+        "math",
+        "science mark",
+      ])
+    ) {
+      responseText = resumeData.ssc;
+    }
+    // 5. Work / Freelance
+    else if (
+      hasAny(lowerText, [
+        "freelance",
+        "work",
+        "job",
+        "experience",
+        "company",
+        "developer",
+      ])
+    ) {
+      responseText = resumeData.freelance;
+    }
+    // 6. Skills
+    else if (
+      hasAny(lowerText, [
+        "skill",
+        "stack",
+        "tech",
+        "tool",
+        "language",
+        "framework",
+      ])
+    ) {
+      responseText = resumeData.skills;
+    }
+    // 7. Projects
+    else if (
+      hasAny(lowerText, ["project", "app", "built", "created", "thesis"])
+    ) {
+      responseText = resumeData.projects;
+    }
+    // 8. General Education (fallback if specific degree not mentioned but "education" is)
+    else if (
+      hasAny(lowerText, [
+        "education",
+        "qualifi",
+        "study",
+        "studied",
+        "score",
+        "percent",
+        "cgpa",
+        "marks",
+      ])
+    ) {
+      // If asking generically about marks/education without a specific level, give a summary
+      responseText =
+        "He has done his MCA (8.5 CGPA), BCA (8.13 CGPA), 12th (60.92%), and 10th (83%). Ask me specifically about any of them for more details!";
+    }
+    // 9. Name
+    else if (hasAny(lowerText, ["name", "who are you", "who is rishabh"])) {
+      responseText = resumeData.name;
+    }
+    // 10. Summary / About
+    else if (
+      hasAny(lowerText, ["summary", "about", "bio", "intro", "detail", "info"])
+    ) {
+      responseText = resumeData.summary;
+    }
+    // 11. Contact
+    else if (
+      hasAny(lowerText, ["contact", "email", "mail", "reach", "social"])
+    ) {
+      responseText =
+        "You can contact him directly via email at " +
+        contactInfo.email +
+        " or on LinkedIn!";
+    }
+
     setTimeout(async () => {
-      const randomQuote =
-        narutoQuotes[Math.floor(Math.random() * narutoQuotes.length)];
-      const narutoMsg: Message = {
-        id: Date.now() + 1,
-        text: randomQuote,
-        sender: "naruto",
-      };
+      let narutoMsg: Message;
+
+      if (responseText) {
+        // Found a relevant answer
+        narutoMsg = {
+          id: Date.now() + 1,
+          text: "Dattebayo! Here is what I know: " + responseText,
+          sender: "naruto",
+        };
+      } else {
+        // Irrelevant question - Naruto Quote + Redirect
+        const randomQuote =
+          narutoQuotes[Math.floor(Math.random() * narutoQuotes.length)];
+        narutoMsg = {
+          id: Date.now() + 1,
+          text:
+            randomQuote +
+            " ... But seriously, I think you should focus on asking relevant questions about Rishabh's skills, projects, or experience! That's the ninja way!",
+          sender: "naruto",
+        };
+      }
+
       messages = [...messages, narutoMsg];
       isTyping = false;
       scrollToBottom();
@@ -262,7 +436,7 @@
       >
         <header class="chat-header">
           <div class="naruto-avatar">
-            <span class="avatar-icon">🦊</span>
+            <img src={narutoFace} alt="Naruto" />
           </div>
           <div class="header-info">
             <h3>Naruto Uzumaki</h3>
@@ -678,8 +852,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    overflow: hidden;
     border: 2px solid #fff;
+  }
+
+  .naruto-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .header-info h3 {
