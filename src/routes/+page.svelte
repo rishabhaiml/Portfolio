@@ -93,24 +93,52 @@
     content="AI, ML, Machine Learning, NLP, LLM, FastAPI, Python, Flutter, Portfolio"
   />
   <meta name="author" content="Rishabh Bipin Shukla" />
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://rishabhai.me" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://rishabhai.me" />
   <meta property="og:title" content="Rishabh Shukla | AI/ML Engineer" />
   <meta
     property="og:description"
     content="Junior AI/ML Engineer building production-ready NLP and LLM solutions."
   />
-  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://rishabhai.me/og-image.png" />
+
+  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://rishabhai.me" />
   <meta name="twitter:title" content="Rishabh Shukla | AI/ML Engineer" />
   <meta
     name="twitter:description"
     content="Junior AI/ML Engineer building production-ready NLP and LLM solutions."
   />
+  <meta name="twitter:image" content="https://rishabhai.me/og-image.png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
     rel="preconnect"
     href="https://fonts.gstatic.com"
     crossorigin="anonymous"
   />
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Rishabh Shukla",
+      "url": "https://rishabhai.me",
+      "jobTitle": "AI/ML Engineer",
+      "sameAs": [
+        "https://github.com/rakshitbhai",
+        "https://linkedin.com/in/rishabhbshukla"
+      ],
+      "description": "Junior AI/ML Engineer specializing in NLP, LLMs, and high-performance backends."
+    }
+  </script>
 </svelte:head>
 
 <!-- Loading Screen -->
