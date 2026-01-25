@@ -157,131 +157,197 @@
     isTyping = true;
 
     // Resume Logic
-    const lowerText = userText.toLowerCase().replace(/[^\w\s]/g, ""); // Remove punctuation for better matching
+    const lowerText = userText.toLowerCase().replace(/[^\w\s]/g, ""); // Remove punctuation
     let responseText = "";
 
-    // 1. MCA / Masters / Post Grad
-    if (
-      hasAny(lowerText, [
-        "mca",
-        "master",
-        "post grad",
-        "met institute",
-        "thesis",
-        "pg",
-      ])
-    ) {
-      responseText = resumeData.mca;
-    }
-    // 2. BCA / Graduation / Bachelors
-    else if (
-      hasAny(lowerText, [
-        "bca",
-        "bachelors",
-        "graduation",
-        "undergrad",
-        "degree",
-        "hinduja",
-        "college",
-      ])
-    ) {
-      responseText = resumeData.bca;
-    }
-    // 3. HSC / 12th
-    else if (
-      hasAny(lowerText, [
-        "hsc",
-        "12th",
-        "twelfth",
-        "junior college",
-        "higher secondary",
-        "computer science mark",
-      ])
-    ) {
-      responseText = resumeData.hsc;
-    }
-    // 4. SSC / 10th
-    else if (
-      hasAny(lowerText, [
-        "ssc",
-        "10th",
-        "tenth",
-        "matric",
-        "metric",
-        "school",
-        "math",
-        "science mark",
-      ])
-    ) {
-      responseText = resumeData.ssc;
-    }
-    // 5. Work / Freelance
-    else if (
-      hasAny(lowerText, [
-        "freelance",
-        "work",
-        "job",
-        "experience",
-        "company",
-        "developer",
-      ])
-    ) {
-      responseText = resumeData.freelance;
-    }
-    // 6. Skills
-    else if (
-      hasAny(lowerText, [
-        "skill",
-        "stack",
-        "tech",
-        "tool",
-        "language",
-        "framework",
-      ])
-    ) {
-      responseText = resumeData.skills;
-    }
-    // 7. Projects
-    else if (
-      hasAny(lowerText, ["project", "app", "built", "created", "thesis"])
-    ) {
-      responseText = resumeData.projects;
-    }
-    // 8. General Education (fallback if specific degree not mentioned but "education" is)
-    else if (
-      hasAny(lowerText, [
-        "education",
-        "qualifi",
-        "study",
-        "studied",
-        "score",
-        "percent",
-        "cgpa",
-        "marks",
-      ])
-    ) {
-      // If asking generically about marks/education without a specific level, give a summary
-      responseText =
-        "He has done his MCA (8.5 CGPA), BCA (8.13 CGPA), 12th (60.92%), and 10th (83%). Ask me specifically about any of them for more details!";
-    }
-    // 9. Name
-    else if (hasAny(lowerText, ["name", "who are you", "who is rishabh"])) {
-      responseText = resumeData.name;
-    }
-    // 10. Summary / About
-    else if (
-      hasAny(lowerText, ["summary", "about", "bio", "intro", "detail", "info"])
-    ) {
-      responseText = resumeData.summary;
-    }
-    // 11. Contact
-    else if (
-      hasAny(lowerText, ["contact", "email", "mail", "reach", "social"])
+    // --- 1. Greetings & Personal Status ---
+    if (hasAny(lowerText, ["hello", "hi", "hey", "greetings", "konnichiwa"])) {
+      responseText = "Dattebayo! Hello there! Ready to learn about Rishabh?";
+    } else if (
+      hasAny(lowerText, ["how are you", "how are u", "doing", "status"])
     ) {
       responseText =
-        "You can contact him directly via email at " +
-        contactInfo.email +
-        " or on LinkedIn!";
+        "I'm doing great, preparing for my next mission! Rishabh is also doing fantastic, coding up some S-rank jutsu!";
+    }
+
+    // --- 2. Time & Age Specific Logic ---
+    // Extract numbers to check for years or ages
+    const numbers = lowerText.match(/\d+/g);
+    if (numbers && numbers.length > 0) {
+      const num = parseInt(numbers[0]);
+
+      // Age Logic (Born ~2000 based on Class of 2016 being 16)
+      // 16 -> 2016 (SSC)
+      // 18 -> 2018 (HSC)
+      // 19-22 -> 2019-2022 (BCA)
+      // 21-24 -> 2021-2024 (Freelance)
+
+      if (lowerText.includes("age") || (num >= 15 && num <= 30)) {
+        if (num === 16 || num === 17)
+          responseText = "At age " + num + ", " + resumeData.ssc;
+        else if (num === 18 || num === 19)
+          responseText = "At age " + num + ", " + resumeData.hsc;
+        else if (num >= 20 && num <= 22)
+          responseText = "At age " + num + ", " + resumeData.bca;
+        else if (num >= 23 && num <= 25)
+          responseText =
+            "At age " +
+            num +
+            ", " +
+            resumeData.freelance +
+            " He also started his MCA.";
+        else if (num > 25)
+          responseText =
+            "That's in the future! But he'll probably be Hokage of the Tech World by then!";
+      }
+
+      // Year Logic
+      if (num > 1990 && num < 2030) {
+        if (num >= 2016 && num <= 2017)
+          responseText = "In " + num + ", " + resumeData.ssc;
+        else if (num >= 2017 && num <= 2019)
+          responseText = "In " + num + ", " + resumeData.hsc;
+        else if (num >= 2019 && num <= 2022)
+          responseText = "In " + num + ", " + resumeData.bca;
+        else if (num >= 2021 && num <= 2024)
+          responseText = "In " + num + ", " + resumeData.freelance;
+        else if (num >= 2024 && num <= 2026)
+          responseText = "In " + num + ", " + resumeData.mca;
+      }
+    }
+
+    // --- 3. Keyword Matching (Fallback if no specific time/greeting matched) ---
+    if (!responseText) {
+      // 1. MCA / Masters / Post Grad
+      if (
+        hasAny(lowerText, [
+          "mca",
+          "master",
+          "post grad",
+          "met institute",
+          "thesis",
+          "pg",
+        ])
+      ) {
+        responseText = resumeData.mca;
+      }
+      // 2. BCA / Graduation / Bachelors
+      else if (
+        hasAny(lowerText, [
+          "bca",
+          "bachelors",
+          "graduation",
+          "undergrad",
+          "degree",
+          "hinduja",
+          "college",
+        ])
+      ) {
+        responseText = resumeData.bca;
+      }
+      // 3. HSC / 12th
+      else if (
+        hasAny(lowerText, [
+          "hsc",
+          "12th",
+          "twelfth",
+          "junior college",
+          "higher secondary",
+          "computer science mark",
+        ])
+      ) {
+        responseText = resumeData.hsc;
+      }
+      // 4. SSC / 10th
+      else if (
+        hasAny(lowerText, [
+          "ssc",
+          "10th",
+          "tenth",
+          "matric",
+          "metric",
+          "school",
+          "math",
+          "science mark",
+        ])
+      ) {
+        responseText = resumeData.ssc;
+      }
+      // 5. Work / Freelance
+      else if (
+        hasAny(lowerText, [
+          "freelance",
+          "work",
+          "job",
+          "experience",
+          "company",
+          "developer",
+        ])
+      ) {
+        responseText = resumeData.freelance;
+      }
+      // 6. Skills
+      else if (
+        hasAny(lowerText, [
+          "skill",
+          "stack",
+          "tech",
+          "tool",
+          "language",
+          "framework",
+        ])
+      ) {
+        responseText = resumeData.skills;
+      }
+      // 7. Projects
+      else if (
+        hasAny(lowerText, ["project", "app", "built", "created", "thesis"])
+      ) {
+        responseText = resumeData.projects;
+      }
+      // 8. General Education (fallback if specific degree not mentioned but "education" is)
+      else if (
+        hasAny(lowerText, [
+          "education",
+          "qualifi",
+          "study",
+          "studied",
+          "score",
+          "percent",
+          "cgpa",
+          "marks",
+        ])
+      ) {
+        // If asking generically about marks/education without a specific level, give a summary
+        responseText =
+          "He has done his MCA (8.5 CGPA), BCA (8.13 CGPA), 12th (60.92%), and 10th (83%). Ask me specifically about any of them for more details!";
+      }
+      // 9. Name
+      else if (hasAny(lowerText, ["name", "who are you", "who is rishabh"])) {
+        responseText = resumeData.name;
+      }
+      // 10. Summary / About
+      else if (
+        hasAny(lowerText, [
+          "summary",
+          "about",
+          "bio",
+          "intro",
+          "detail",
+          "info",
+        ])
+      ) {
+        responseText = resumeData.summary;
+      }
+      // 11. Contact
+      else if (
+        hasAny(lowerText, ["contact", "email", "mail", "reach", "social"])
+      ) {
+        responseText =
+          "You can contact him directly via email at " +
+          contactInfo.email +
+          " or on LinkedIn!";
+      }
     }
 
     setTimeout(async () => {
@@ -291,7 +357,8 @@
         // Found a relevant answer
         narutoMsg = {
           id: Date.now() + 1,
-          text: "Dattebayo! Here is what I know: " + responseText,
+          text: "Dattebayo! " + responseText,
+          // Removed manual "Here is what I know" to make custom responses flow better
           sender: "naruto",
         };
       } else {
