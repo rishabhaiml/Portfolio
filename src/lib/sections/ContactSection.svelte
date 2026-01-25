@@ -8,13 +8,20 @@
 -->
 <script lang="ts">
   import { onMount } from "svelte";
-  import { eyeEvolution, currentSection, visitedSections } from "$lib/stores";
+  import {
+    eyeEvolution,
+    currentSection,
+    visitedSections,
+    rinneganMerged,
+  } from "$lib/stores";
   import SharinganEye from "$lib/components/SharinganEye.svelte";
   import { fade, fly } from "svelte/transition";
   import { tick } from "svelte";
   import dattebayoSound from "$lib/assets/dattebayo.mp3";
   import chakraSound from "$lib/assets/chakra-nature.mp3";
   import narutoFace from "$lib/assets/naruto-face.png";
+  import rinneganSvg from "$lib/assets/Rinnegan_Sasuke.svg";
+  import sasukeMangekyouSvg from "$lib/assets/Sasuke_Mangekyou.svg";
 
   // Custom Transition for Scroll Opening
   function scrollUnroll(
@@ -328,13 +335,50 @@
         id="rinnegan-merge-target"
         class="rinnegan-display"
         class:visible={isVisible}
+        class:merging={$rinneganMerged}
       >
-        <SharinganEye
-          variant="sasuke-rinne"
-          forceMangekyou={true}
-          size={200}
-          showLabel={true}
-        />
+        <!-- Shockwave Effect Container -->
+        {#if $rinneganMerged}
+          <div class="godly-shockwave"></div>
+          <div class="godly-flash"></div>
+        {/if}
+
+        <div class="rinnegan-container">
+          <div class="ripple-container">
+            <div class="ripple ripple-1"></div>
+            <div class="ripple ripple-2"></div>
+            <div class="ripple ripple-3"></div>
+          </div>
+
+          <!-- THE GODLY TRANSFORMATION -->
+          <div class="eye-wrapper">
+            {#if $rinneganMerged}
+              <!-- Final Form: Rinnegan -->
+              <div
+                class="rinnegan-final"
+                in:fade={{ duration: 800, delay: 200 }}
+              >
+                <img src={rinneganSvg} alt="Rinnegan" class="rinnegan-svg" />
+              </div>
+            {:else}
+              <!-- Initial Form: Sasuke Mangekyou Sharingan -->
+              <div class="sasuke-initial" out:fade={{ duration: 200 }}>
+                <img
+                  src={sasukeMangekyouSvg}
+                  alt="Sasuke Mangekyou"
+                  class="rinnegan-svg"
+                />
+              </div>
+            {/if}
+          </div>
+
+          <div class="rinnegan-label">
+            <span class="label-text"
+              >{$rinneganMerged ? "Rinnegan" : "Mangekyou"}</span
+            >
+            <span class="label-sub">Visual Prowess</span>
+          </div>
+        </div>
       </div>
 
       <div class="contact-info" class:visible={isVisible}>
@@ -532,44 +576,214 @@
     opacity: 0;
     transform: scale(0.8);
     transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    z-index: 2;
   }
 
   .rinnegan-display.visible {
     opacity: 1;
     transform: scale(1);
-    animation: rinneganPulse 3s ease-in-out infinite;
   }
 
-  /* Rinne Sharingan animation - subtle rotation and pulse */
-  @keyframes rinneganPulse {
+  .rinnegan-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+  }
+
+  /* Ripple Effect */
+  .ripple-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center relative to container */
+    width: 250px;
+    height: 250px; /* Match SVG size */
+    z-index: 0;
+    pointer-events: none;
+    margin-top: -35px; /* Offset for label gap to center on eye */
+  }
+
+  .ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+    opacity: 0;
+    animation: rippleExpand 4s linear infinite;
+  }
+
+  .ripple-1 {
+    animation-delay: 0s;
+  }
+  .ripple-2 {
+    animation-delay: 1.3s;
+  }
+  .ripple-3 {
+    animation-delay: 2.6s;
+  }
+
+  @keyframes rippleExpand {
+    0% {
+      width: 250px;
+      height: 250px;
+      opacity: 0.6;
+      border-width: 2px;
+    }
+    100% {
+      width: 500px;
+      height: 500px;
+      opacity: 0;
+      border-width: 0px;
+    }
+  }
+
+  .rinnegan-svg {
+    width: 250px;
+    height: 250px;
+    filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.5));
+    /* Float is handled by wrapper now to sync both eyes */
+    display: block;
+  }
+
+  .eye-wrapper {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    animation: rinneganFloat 6s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  .rinnegan-final,
+  .sasuke-initial {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Godly Shockwave & Flash */
+  .godly-shockwave {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 50px solid rgba(139, 92, 246, 0.8);
+    z-index: 3;
+    animation: shockwaveExplode 1s cubic-bezier(0, 0, 0.2, 1) forwards;
+    pointer-events: none;
+  }
+
+  @keyframes shockwaveExplode {
+    0% {
+      width: 0;
+      height: 0;
+      opacity: 1;
+      border-width: 50px;
+    }
+    100% {
+      width: 1000px;
+      height: 1000px;
+      opacity: 0;
+      border-width: 0;
+    }
+  }
+
+  .godly-flash {
+    position: absolute;
+    inset: -500px;
+    background: radial-gradient(
+      circle,
+      rgba(139, 92, 246, 0.8) 0%,
+      transparent 70%
+    );
+    z-index: 4;
+    opacity: 0;
+    animation: divineFlash 0.5s ease-out forwards;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+
+  @keyframes divineFlash {
+    0% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    20% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.5);
+    }
+  }
+
+  @keyframes rinneganFloat {
     0%,
     100% {
-      filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.5))
-        drop-shadow(0 0 40px rgba(139, 92, 246, 0.3));
+      transform: translateY(0);
     }
     50% {
-      filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.8))
-        drop-shadow(0 0 60px rgba(139, 92, 246, 0.5));
+      transform: translateY(-10px);
     }
   }
 
-  .rinnegan-display.visible :global(.eye-svg) {
-    animation: rinneganRotate 20s linear infinite;
+  .rinnegan-label {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
   }
 
-  @keyframes rinneganRotate {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+  .label-text {
+    font-family: "Cinzel", serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+    background: linear-gradient(to right, #e9d5ff, #c084fc, #e9d5ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+    animation: textShine 3s linear infinite;
   }
 
-  .contact-info {
-    opacity: 0;
-    transform: translateX(30px);
-    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+  .label-sub {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.4rem;
+    font-weight: 300;
+  }
+
+  @keyframes textShine {
+    0% {
+      background-position: 0% 50%;
+      filter: brightness(100%);
+    }
+    50% {
+      background-position: 100% 50%;
+      filter: brightness(150%);
+    }
+    100% {
+      background-position: 0% 50%;
+      filter: brightness(100%);
+    }
   }
 
   .contact-info.visible {
@@ -722,11 +936,20 @@
     }
 
     .rinnegan-display {
-      transform: scale(0.6);
+      transform: scale(0.8);
     }
 
     .rinnegan-display.visible {
-      transform: scale(0.6);
+      transform: scale(0.8);
+    }
+
+    .rinnegan-svg {
+      width: 200px;
+      height: 200px;
+    }
+
+    .label-text {
+      font-size: 1.2rem;
     }
 
     .contact-info.visible {
@@ -753,12 +976,12 @@
 
   @media (max-width: 480px) {
     .rinnegan-display {
-      transform: scale(0.5);
-      margin: -2rem 0;
+      transform: scale(0.8);
+      margin: -1rem 0;
     }
 
     .rinnegan-display.visible {
-      transform: scale(0.5);
+      transform: scale(0.8);
     }
 
     .contact-card {

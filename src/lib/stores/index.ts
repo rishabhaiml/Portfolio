@@ -89,3 +89,8 @@ export const reducedMotion = writable<boolean>(false);
  * Loader completion state - signals when RasenganLoader finishes
  */
 export const loaderComplete = writable<boolean>(false);
+
+/**
+ * Rinnegan merge state - true when progress eye has merged with contact eye
+ */
+export const rinneganMerged = writable<boolean>(false);

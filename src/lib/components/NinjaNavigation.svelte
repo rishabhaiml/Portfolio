@@ -11,10 +11,12 @@
     SECTIONS,
     visitedSections,
     soundEnabled,
+    rinneganMerged,
   } from "$lib/stores";
   import SharinganEye from "./SharinganEye.svelte";
   import ChakraActiveIndicator from "./ChakraActiveIndicator.svelte";
   import uchihaClanIcon from "$lib/assets/uchiha_clan.svg";
+  import rinneganSvg from "$lib/assets/Rinnegan_Sasuke.svg";
   import { slide, fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
@@ -32,9 +34,10 @@
   // Merge Target Tracking
   let targetTop = 0;
   let targetLeft = 0;
+  let isMerging = false; // New state for merging trigger
 
   function updateMergeTarget() {
-    if (scrollProgress > 90) {
+    if (isMerging) {
       const target = document.getElementById("rinnegan-merge-target");
       if (target) {
         const rect = target.getBoundingClientRect();
@@ -45,8 +48,15 @@
     }
   }
 
-  $: if (scrollProgress > 90) {
+  $: if (isMerging) {
     updateMergeTarget();
+    // Set merged state after animation completes (1.2s transition)
+    // We trigger slightly earlier (1000ms) to start the implosion effect as the eye arrives
+    setTimeout(() => {
+      rinneganMerged.set(true);
+    }, 1000);
+  } else {
+    rinneganMerged.set(false);
   }
 
   const navItems = [
@@ -105,23 +115,44 @@
     // Scale eye gradually based on scroll progress (1.0 -> 1.5)
     eyeScale = 1 + (scrollProgress / 100) * 0.5;
 
-    // Determine Evolution Stage based on scroll
-    if (scrollProgress < 25) {
-      eyeStage = 1; // 1 Tomoe
-      eyeVariant = "sasuke";
-    } else if (scrollProgress < 50) {
-      eyeStage = 2; // 2 Tomoe
-      eyeVariant = "sasuke";
-    } else if (scrollProgress < 75) {
-      eyeStage = 3; // 3 Tomoe
-      eyeVariant = "sasuke";
-    } else if (scrollProgress < 90) {
-      eyeStage = 4; // Mangekyou
-      eyeVariant = "sasuke";
-    } else {
-      eyeStage = 4; // Rinne Sharingan (technically a variant of Mangekyou stage in this component logic)
+    // Determine Evolution Stage based on SECTION scroll progress
+    const getSectionProgress = (id: string) => {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      const rect = el.getBoundingClientRect();
+      const height = rect.height;
+      // Progress is how much of the section has been scrolled PASt the top of viewport
+      // rect.top is distance from viewport top to element top
+      // when rect.top is 0, progress is 0.
+      // when rect.top is -height, progress is 1 (fully scrolled past)
+      return -rect.top / height;
+    };
+
+    const homeProgress = getSectionProgress("hero");
+    const skillsProgress = getSectionProgress("skills");
+    const projectsProgress = getSectionProgress("projects");
+    const experienceProgress = getSectionProgress("experience");
+
+    // Default State
+    eyeStage = 1;
+    eyeVariant = "sasuke";
+
+    // Logic: 70% of section triggers next level until next section reaches 70%
+    // We check in reverse order of priority
+
+    if (experienceProgress > 0.45) {
+      eyeStage = 5; // Rinnegan
       eyeVariant = "sasuke-rinne";
+    } else if (projectsProgress > 0.7) {
+      eyeStage = 4; // Mangekyou
+    } else if (skillsProgress > 0.7) {
+      eyeStage = 3; // 3-Tomoe
+    } else if (homeProgress > 0.7) {
+      eyeStage = 2; // 2-Tomoe
     }
+
+    // Detach Logic: Experience > 60%
+    isMerging = experienceProgress > 0.6;
 
     // Calculate rotation based on core scroll progress (360 degrees for full scroll)
     eyeRotation = (scrollProgress / 100) * 360;
@@ -146,18 +177,27 @@
     <div
       class="eye-progress-indicator"
       class:at-navbar={!hasScrolledOnce}
-      class:at-progress={hasScrolledOnce && scrollProgress <= 95}
-      class:merging={scrollProgress > 95}
+      class:at-progress={hasScrolledOnce && !isMerging}
+      class:merging={isMerging}
       style="--raw-progress: {scrollProgress}; --eye-scale: {eyeScale}; --target-top: {targetTop}px; --target-left: {targetLeft}px;"
     >
-      <SharinganEye
-        size={32}
-        variant={eyeVariant}
-        stage={eyeStage}
-        externalRotation={eyeRotation}
-        allowIdleRotation={false}
-        triggerActivation={scrollProgress > 90 && eyeVariant === "sasuke-rinne"}
-      />
+      {#if eyeVariant === "sasuke-rinne"}
+        <img
+          src={rinneganSvg}
+          alt="Rinnegan"
+          class="progress-rinnegan"
+          style="transform: rotate({eyeRotation}deg);"
+        />
+      {:else}
+        <SharinganEye
+          size={32}
+          variant={eyeVariant}
+          stage={eyeStage}
+          externalRotation={eyeRotation}
+          allowIdleRotation={false}
+          triggerActivation={false}
+        />
+      {/if}
     </div>
   </div>
 
@@ -469,6 +509,11 @@
     /* Scale from 32px to match the 200px Rinnegan in ContactSection (~6.25x) */
     transform: translate(-50%, -50%) scale(6);
     opacity: 0;
+    transition:
+      top 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+      left 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.6s ease 0.6s;
     filter: drop-shadow(0 0 30px var(--rinnegan-purple));
   }
 
@@ -480,14 +525,6 @@
     margin: 0;
     padding: 0;
     width: 100%; /* Ensure list takes full width for proper spacing */
-  }
-
-  /* Spacer to reserve room for the logo */
-  .nav-logo-spacer {
-    width: 60px; /* Width of eye (32-40px) + margins */
-    height: 40px;
-    margin-right: auto; /* Push other items to the right/center if needed, or just let gap handle it */
-    flex-shrink: 0;
   }
 
   .nav-list.desktop {
@@ -826,5 +863,21 @@
   .sound-toggle:not(.muted):hover .note-svg {
     transform: scale(1.1) rotate(5deg);
     filter: drop-shadow(0 0 12px var(--sharingan-red-glow));
+  }
+  .progress-rinnegan {
+    width: 32px;
+    height: 32px;
+    filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.6));
+    /* Animation removed to follow scroll rules */
+    transition: transform 0.1s linear;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>
