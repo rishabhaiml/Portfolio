@@ -339,8 +339,8 @@
       >
         <!-- Shockwave Effect Container -->
         {#if $rinneganMerged}
-          <div class="godly-shockwave"></div>
-          <div class="godly-flash"></div>
+          <div class="godly-shockwave" out:fade={{ duration: 500 }}></div>
+          <div class="godly-flash" out:fade={{ duration: 500 }}></div>
         {/if}
 
         <div class="rinnegan-container">
@@ -357,12 +357,17 @@
               <div
                 class="rinnegan-final"
                 in:fade={{ duration: 800, delay: 200 }}
+                out:fade={{ duration: 400 }}
               >
                 <img src={rinneganSvg} alt="Rinnegan" class="rinnegan-svg" />
               </div>
             {:else}
               <!-- Initial Form: Sasuke Mangekyou Sharingan -->
-              <div class="sasuke-initial" out:fade={{ duration: 200 }}>
+              <div
+                class="sasuke-initial"
+                in:fade={{ duration: 400 }}
+                out:fade={{ duration: 200 }}
+              >
                 <img
                   src={sasukeMangekyouSvg}
                   alt="Sasuke Mangekyou"

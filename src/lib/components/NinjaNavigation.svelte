@@ -437,11 +437,13 @@
     z-index: 2000;
     pointer-events: none;
     will-change: transform, top, left, opacity; /* Performance optimization */
+    will-change: transform, top, left, opacity; /* Performance optimization */
     transition:
       top 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-      /* Slower for "good animation" */ left 0.1s linear,
-      transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-      opacity 0.6s ease 0.2s; /* Slight delay on opacity for merge */
+      left 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      /* Smoother diagonal follow */ transform 0.8s
+        cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.6s ease 0s; /* Immediate fade-in on return */
   }
 
   /* State 1: Navbar "Logo" Position */
