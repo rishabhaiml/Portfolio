@@ -22,6 +22,7 @@
   import narutoFace from "$lib/assets/naruto-face.png";
   import rinneganSvg from "$lib/assets/Rinnegan_Sasuke.svg";
   import sasukeMangekyouSvg from "$lib/assets/Sasuke_Mangekyou.svg";
+  import resumeFile from "$lib/assets/rishabh-resume.pdf";
 
   // Custom Transition for Scroll Opening
   function scrollUnroll(
@@ -76,6 +77,10 @@
     return keywords.some((k) => text.includes(k));
   }
 
+  function hasWholeWord(text: string, keywords: string[]) {
+    return keywords.some((k) => new RegExp(`\\b${k}\\b`).test(text));
+  }
+
   onMount(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -104,6 +109,11 @@
     id: number;
     text: string;
     sender: "user" | "naruto";
+    action?: {
+      type: "email" | "link" | "file";
+      label: string;
+      value: string;
+    };
   }
 
   let messages: Message[] = [
@@ -159,12 +169,18 @@
     // Resume Logic
     const lowerText = userText.toLowerCase().replace(/[^\w\s]/g, ""); // Remove punctuation
     let responseText = "";
+    let actionButton:
+      | { type: "email" | "link" | "file"; label: string; value: string }
+      | undefined = undefined;
 
     // --- 1. Greetings & Personal Status ---
-    if (hasAny(lowerText, ["hello", "hi", "hey", "greetings", "konnichiwa"])) {
+    // Use hasWholeWord for greetings to prevent "hi" matching inside "his" or "history"
+    if (
+      hasWholeWord(lowerText, ["hello", "hi", "hey", "greetings", "konnichiwa"])
+    ) {
       responseText = "Dattebayo! Hello there! Ready to learn about Rishabh?";
     } else if (
-      hasAny(lowerText, ["how are you", "how are u", "doing", "status"])
+      hasWholeWord(lowerText, ["how are you", "how are u", "doing", "status"])
     ) {
       responseText =
         "I'm doing great, preparing for my next mission! Rishabh is also doing fantastic, coding up some S-rank jutsu!";
@@ -216,7 +232,188 @@
       }
     }
 
-    // --- 3. Keyword Matching (Fallback if no specific time/greeting matched) ---
+    // --- 3. Abstract & "Twisted" Logic (Career, Mission, Vision) ---
+    if (!responseText) {
+      if (
+        hasAny(lowerText, [
+          "mission",
+          "vision",
+          "goal",
+          "objective",
+          "ninja way",
+          "nindo",
+          "dream",
+        ])
+      ) {
+        responseText =
+          "My nindo... err, Rishabh's mission is to bridge the gap between human language and machine understanding! He envisions building intelligent systems that enhance human capability, just like how I use Kurama's power to protect my friends!";
+      } else if (
+        hasAny(lowerText, [
+          "career",
+          "path",
+          "journey",
+          "timeline",
+          "history",
+          "background",
+        ])
+      ) {
+        responseText =
+          "It's been quite a journey! From scoring 96/100 in Math during his Genin days (SSC), to mastering Flutter and AI in his Chunin exams (BCA), and now synthesizing Music with Deep Learning in his Jonin training (MCA)! A true prodigy!";
+      } else if (
+        hasAny(lowerText, [
+          "resume",
+          "cv",
+          "download",
+          "curriculum vitae",
+          "document",
+        ])
+      ) {
+        responseText =
+          "Here is his official Ninja Scroll! It contains all the details of his S-rank missions and skills.";
+        actionButton = {
+          type: "file",
+          label: "📜 Download Resume",
+          value: resumeFile,
+        };
+      }
+    }
+
+    // --- 5. Persona Handling (Recruiter, Funny, "Ero-Sennin", Clumsy) ---
+    // Extract salary logic to handle action button variable
+
+    if (!responseText) {
+      // Recruiter Mode (Professional details)
+      if (
+        hasAny(lowerText, [
+          "salary",
+          "compensation",
+          "pay",
+          "ctc",
+          "package",
+          "remuneration",
+        ])
+      ) {
+        responseText =
+          "Rishabh is open to discussing compensation that aligns with industry standards for his skill set and experience. He values roles that offer growth and challenging projects!";
+      } else if (
+        hasAny(lowerText, [
+          "recruiter",
+          "hiring manager",
+          "hr",
+          "talent acquisition",
+        ])
+      ) {
+        responseText =
+          "Ah, a fellow shinobi of the Hidden Leaf HR! Rishabh is actively seeking full-time roles in AI/ML and App Development. His full resume and portfolio are available for your review!";
+      }
+      // Funny / Playful responses
+      else if (
+        hasAny(lowerText, [
+          "joke",
+          "funny",
+          "laugh",
+          "prank",
+          "tell me something funny",
+        ])
+      ) {
+        responseText =
+          "Why did the JavaScript developer quit his job? Because he didn't Node how to Express himself!";
+      }
+      // "Pervert" / Flirty Mode (Naruto Deflection)
+      else if (
+        hasAny(lowerText, [
+          "sexy",
+          "kiss",
+          "love",
+          "date",
+          "girlfriend",
+          "gf",
+          "single",
+          "marry",
+          "cute",
+          "hot",
+        ])
+      ) {
+        responseText =
+          "Whoa there! I think you're looking for Pervy Sage (Jiraiya)! I'm just here to talk about code and ramen! 🍥😳";
+      }
+      // Clumsy / Confused Mode
+      else if (
+        hasAny(lowerText, [
+          "help",
+          "stuck",
+          "what do i do",
+          "confused",
+          "lost",
+          "idk",
+        ])
+      ) {
+        responseText =
+          "Don't panic! Just scroll up to see his Skills (Jutsu) or down to check his Projects (Missions). Or just ask 'What skills does he have?'";
+      }
+    }
+
+    // --- 4. Broad Vocabulary & Common Questions ---
+    if (!responseText) {
+      // Portfolio / Tech Stack of THIS website
+      if (
+        hasAny(lowerText, [
+          "how did you make",
+          "made this",
+          "portfolio tech",
+          "site built",
+          "website stack",
+          "source code",
+        ])
+      ) {
+        responseText =
+          "This portfolio was crafted by his AI Assistant (me!) using SvelteKit to showcase his work. Rishabh himself focuses on the S-rank logic—Python, RAG pipelines, and Large Language Models!";
+      }
+      // Hiring / Availability
+      else if (
+        hasAny(lowerText, [
+          "hire",
+          "available",
+          "job",
+          "open for",
+          "vacancy",
+          "recruit",
+        ])
+      ) {
+        responseText =
+          "Rishabh is currently open to new S-rank missions (Full-time roles) in AI/ML and App Development! Send a raven... or just an email!";
+      }
+      // Soft Skills / Strengths
+      else if (
+        hasAny(lowerText, [
+          "strength",
+          "weakness",
+          "soft skill",
+          "leadership",
+          "team",
+          "hard working",
+        ])
+      ) {
+        responseText =
+          "His strengths? Unyielding determination (Nindo), rapid learning capabilities (Sharingan), and team collaboration! He believes in lifting others up, just like a true Hokage.";
+      }
+      // Theme / Why Naruto
+      else if (
+        hasAny(lowerText, [
+          "why naruto",
+          "anime",
+          "weeb",
+          "fan",
+          "theme",
+          "design",
+        ])
+      ) {
+        responseText =
+          "Why Naruto? Because the Will of Fire – the desire to protect and build for others – perfectly aligns with Software Engineering! Plus, he just really likes anime.";
+      }
+    }
+
+    // --- 6. Keyword Matching (Fallback if no specific time/greeting/abstract matched) ---
     if (!responseText) {
       // 1. MCA / Masters / Post Grad
       if (
@@ -360,6 +557,7 @@
           text: "Dattebayo! " + responseText,
           // Removed manual "Here is what I know" to make custom responses flow better
           sender: "naruto",
+          action: actionButton,
         };
       } else {
         // Irrelevant question - Naruto Quote + Redirect
@@ -581,6 +779,28 @@
             <div class="message {msg.sender}" in:fly={{ y: 20, duration: 300 }}>
               <div class="message-content">
                 {msg.text}
+                {#if msg.action}
+                  <div class="message-action">
+                    {#if msg.action.type === "email"}
+                      <a
+                        href="mailto:{msg.action
+                          .value}?subject=Salary%20Inquiry%20from%20Portfolio"
+                        class="chat-action-btn"
+                      >
+                        {msg.action.label}
+                      </a>
+                    {:else if msg.action.type === "file"}
+                      <a
+                        href={msg.action.value}
+                        download="Rishabh_Shukla_Resume.pdf"
+                        class="chat-action-btn"
+                        target="_blank"
+                      >
+                        {msg.action.label}
+                      </a>
+                    {/if}
+                  </div>
+                {/if}
               </div>
             </div>
           {/each}
@@ -1311,5 +1531,26 @@
   .send-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+  .message-action {
+    margin-top: 0.5rem;
+  }
+
+  .chat-action-btn {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .chat-action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
   }
 </style>
