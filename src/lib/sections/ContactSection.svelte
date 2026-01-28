@@ -712,7 +712,7 @@
 
     <!-- Footer -->
     <footer class="portfolio-footer">
-      <p>Made by AI (to showcase Rishabh Shukla's Work)</p>
+      <p>Forged by Rishabh Shukla & AI • Powered by the Will of Fire 🔥</p>
       <p class="footer-ninja">The path of the ninja never ends.</p>
       <div class="legal-disclaimer">
         <p>
