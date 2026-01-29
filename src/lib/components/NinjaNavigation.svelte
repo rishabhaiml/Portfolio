@@ -15,7 +15,6 @@
   } from "$lib/stores";
   import SharinganEye from "./SharinganEye.svelte";
   import ChakraActiveIndicator from "./ChakraActiveIndicator.svelte";
-  import uchihaClanIcon from "$lib/assets/uchiha_clan.svg";
   import rinneganSvg from "$lib/assets/Rinnegan_Sasuke.svg";
   import { slide, fade } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
@@ -273,13 +272,39 @@
     aria-expanded={isMenuOpen}
     aria-label="Toggle navigation menu"
   >
-    <img
-      src={uchihaClanIcon}
-      alt="Uchiha Clan Symbol"
+    <svg
+      viewBox="0 0 500 600"
       class="uchiha-symbol-icon"
       width="28"
       height="34"
-    />
+      aria-label="Uchiha Clan Symbol"
+    >
+      <defs>
+        <clipPath id="uchiha-clip">
+          <path
+            d="M -382.85715,229.50504 A 167.14285,162.85715 0 1 1 -717.14285,229.50504 A 167.14285,162.85715 0 1 1 -382.85715,229.50504 z"
+            transform="translate(0,145.71429)"
+          />
+        </clipPath>
+      </defs>
+      <g transform="translate(-81.375319,-28.964096)">
+        <path
+          style="fill:#e20909;stroke:#000000;stroke-width:3"
+          d="M -382.85715,229.50504 A 167.14285,162.85715 0 1 1 -717.14285,229.50504 A 167.14285,162.85715 0 1 1 -382.85715,229.50504 z"
+          transform="translate(884.28569,26.154996)"
+        />
+        <path
+          style="fill:#ffffff;stroke:#000000;stroke-width:3"
+          clip-path="url(#uchiha-clip)"
+          d="M -382.85715,229.50504 A 167.14285,162.85715 0 1 1 -717.14285,229.50504 A 167.14285,162.85715 0 1 1 -382.85715,229.50504 z"
+          transform="translate(884.28571,26.892864)"
+        />
+        <path
+          style="fill:#ffffff;stroke:#000000;stroke-width:3;fill-rule:evenodd"
+          d="M 306.27502,415.7941 C 291.17226,552.92714 291.17226,552.92714 291.17226,552.92714 C 372.01842,553.13467 371.83449,552.95414 371.83449,552.95414 C 360.59263,415.87341 360.77657,415.73635 360.77657,415.73635"
+        />
+      </g>
+    </svg>
   </button>
 
   <!-- Mobile Navigation -->
