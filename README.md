@@ -1,5 +1,7 @@
 # 🍥 Naruto-Themed Portfolio
 
+**Live Demo:** [https://rishabhai.me](https://rishabhai.me)
+
 An immersive, animation-rich personal portfolio website built with **SvelteKit** featuring a stunning Naruto theme with Sharingan evolution and Kamui effects.
 
 ## ✨ Features
