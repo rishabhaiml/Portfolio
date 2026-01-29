@@ -50,7 +50,7 @@
       period: "Jan 2021 - Mar 2024",
       type: "work" as const,
       description: [
-        "Delivered 15+ production-grade cross-platform mobile apps",
+        "Delivered many production-grade cross-platform mobile apps",
         "Deployed containerized backend microservices using Docker",
         "Built reactive UIs with GetX state management",
       ],

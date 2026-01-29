@@ -94,6 +94,12 @@
   />
   <meta name="author" content="Rishabh Bipin Shukla" />
 
+  <!-- Robots / AI Crawling Permissions -->
+  <meta
+    name="robots"
+    content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+  />
+
   <!-- Canonical URL -->
   <link rel="canonical" href="https://rishabhai.me" />
 
