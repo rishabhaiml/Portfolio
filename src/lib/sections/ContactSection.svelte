@@ -146,8 +146,16 @@
     }
   }
 
+  // Performance: Cache audio objects to reduce GC pressure and avoid iOS audio limits
+  const soundCache = new Map<string, HTMLAudioElement>();
+
   function playSound(soundFile: string) {
-    const audio = new Audio(soundFile);
+    let audio = soundCache.get(soundFile);
+    if (!audio) {
+      audio = new Audio(soundFile);
+      soundCache.set(soundFile, audio);
+    }
+    audio.currentTime = 0;
     audio.play().catch((e) => console.log("Audio play failed:", e));
   }
 

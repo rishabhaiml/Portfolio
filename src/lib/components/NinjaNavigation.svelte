@@ -92,7 +92,20 @@
     isMenuOpen = !isMenuOpen;
   }
 
+  // Performance: RAF throttling flag to prevent layout thrashing
+  let scrollTicking = false;
+
   function handleScroll() {
+    if (scrollTicking) return;
+
+    scrollTicking = true;
+    requestAnimationFrame(() => {
+      updateScrollState();
+      scrollTicking = false;
+    });
+  }
+
+  function updateScrollState() {
     const scrollY = window.scrollY;
     const docHeight =
       document.documentElement.scrollHeight - window.innerHeight;
@@ -159,7 +172,7 @@
 
   onMount(() => {
     window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll(); // Initial check
+    updateScrollState(); // Initial check - call directly, no need for RAF
 
     return () => {
       window.removeEventListener("scroll", handleScroll);

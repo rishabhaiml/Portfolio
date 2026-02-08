@@ -130,16 +130,16 @@
       0 0 40px #ffffff,
       0 0 80px #3b82f6;
     z-index: 10;
-    animation: coreFlicker 0.1s infinite alternate;
+    /* Performance: Slower animation, opacity-only to reduce composite updates */
+    animation: coreFlicker 0.4s ease-in-out infinite alternate;
+    will-change: opacity;
   }
 
   @keyframes coreFlicker {
     from {
-      transform: scale(0.95);
-      opacity: 0.9;
+      opacity: 0.85;
     }
     to {
-      transform: scale(1.05);
       opacity: 1;
     }
   }

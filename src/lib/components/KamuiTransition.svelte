@@ -25,6 +25,9 @@
   const ARM_COUNT = 8;
   const LINE_WIDTH = 3;
 
+  // Performance: Detect mobile for shadow optimization
+  let isMobile = false;
+
   $: if ($isNavigating && phase === "idle") {
     startKamui();
   }
@@ -124,9 +127,12 @@
     ctx.translate(cx, cy);
     ctx.rotate(rotationAngle);
 
-    // Enable subtle white glow for transparent effect
-    ctx.shadowColor = `rgba(255, 255, 255, ${0.6 * intensity})`;
-    ctx.shadowBlur = 8;
+    // Performance: Only enable expensive shadowBlur on desktop
+    // shadowBlur is software-rendered on many mobile GPUs
+    if (!isMobile) {
+      ctx.shadowColor = `rgba(255, 255, 255, ${0.6 * intensity})`;
+      ctx.shadowBlur = 8;
+    }
 
     for (let i = 0; i < ARM_COUNT; i++) {
       const baseAngle = (i / ARM_COUNT) * Math.PI * 2;
@@ -189,6 +195,9 @@
 
   onMount(() => {
     ctx = canvas.getContext("2d");
+
+    // Performance: Detect mobile to disable expensive shadowBlur
+    isMobile = window.innerWidth <= 768;
 
     // CRITICAL: Reset navigation state on mount to prevent overlay persisting
     // This handles the case where user navigates back from blog

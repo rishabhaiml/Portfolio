@@ -182,13 +182,20 @@
 
     // Draw connections between nearby particles (desktop only)
     // Performance fix: Use squared distance to avoid sqrt until needed
+    // Performance fix: Limit connections per particle to reduce O(n²) overhead
     if (!isMobile) {
       ctx.strokeStyle = `hsla(${baseHue}, 70%, 50%, 0.1)`;
       ctx.lineWidth = 0.5;
       const maxDistSq = 10000; // 100 * 100
+      const MAX_CONNECTIONS_PER_PARTICLE = 3;
 
       for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
+        let connections = 0;
+        for (
+          let j = i + 1;
+          j < particles.length && connections < MAX_CONNECTIONS_PER_PARTICLE;
+          j++
+        ) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const distSq = dx * dx + dy * dy;
@@ -201,6 +208,7 @@
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.stroke();
+            connections++;
           }
         }
       }

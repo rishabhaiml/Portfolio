@@ -2,8 +2,7 @@
    NARUTO-THEMED PORTFOLIO - GLOBAL STYLES
    ===================================================== */
 
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Inter:wght@400;500;600&display=swap');
+/* Google Fonts loaded via non-blocking <link> in app.html */
 
 /* =====================================================
    CSS VARIABLES - NARUTO THEME
