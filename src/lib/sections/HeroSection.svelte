@@ -136,7 +136,7 @@
           <div class="scroll-indicator" aria-label="Scroll down">
             <div class="kunai-scroll">
               <img
-                src="/src/lib/assets/kunai.webp"
+                src="/kunai.webp"
                 alt=""
                 style="height: 40px; width: auto;"
               />
@@ -208,7 +208,7 @@
       <!-- Scroll Indicator -->
       <div class="scroll-indicator" aria-label="Scroll down">
         <div class="kunai-scroll">
-          <img src="/src/lib/assets/kunai.webp" alt="" width="20" height="35" />
+          <img src="/kunai.webp" alt="" width="20" height="35" />
         </div>
         <span class="scroll-text">SCROLL</span>
       </div>

@@ -1,26 +1,41 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { base } from "$app/paths";
-    // We can load posts here directly since we are pre-rendering
-    import { fetchMarkdownPosts } from "$lib/utils/posts";
     import { getAuthor } from "$lib/utils/blog";
     import { audioController } from "$lib/stores/audio";
     import { AKATSUKI_THEME } from "$lib/config/audioMaps";
     import AkatsukiCloud from "$lib/components/AkatsukiCloud.svelte";
 
-    let posts: any[] = [];
+    // Get pre-rendered posts from load function
+    interface Props {
+        data: { posts: any[] };
+    }
+    let { data }: Props = $props();
+    let posts = $derived(data.posts);
 
-    onMount(async () => {
+    onMount(() => {
         // Ensure Akatsuki theme is playing for the main listing
         audioController.setTrack(AKATSUKI_THEME);
-
-        posts = await fetchMarkdownPosts();
     });
 </script>
 
 <svelte:head>
-    <title>Blog | My Portfolio</title>
-    <meta name="description" content="Read my latest thoughts and tutorials." />
+    <title>Blog | Rishabh Shukla - AI/ML Insights</title>
+    <meta
+        name="description"
+        content="Read Rishabh Shukla's insights on AI, machine learning, and technology. Practical tutorials and thought-provoking articles."
+    />
+    <link rel="canonical" href="https://rishabhai.me/blog" />
+    <meta property="og:title" content="Blog | Rishabh Shukla" />
+    <meta
+        property="og:description"
+        content="AI/ML insights, tutorials, and thought-provoking articles by Rishabh Shukla."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://rishabhai.me/blog" />
+    <meta property="og:image" content="https://rishabhai.me/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://rishabhai.me/og-image.png" />
 </svelte:head>
 
 <div class="blog-hero-section">

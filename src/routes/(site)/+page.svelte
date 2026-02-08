@@ -151,6 +151,9 @@
   </script>
 </svelte:head>
 
+<!-- Skip to content link for accessibility -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
 <!-- Loading Screen -->
 {#if isLoading}
   <div class="loading-screen" aria-hidden="true">
@@ -183,9 +186,6 @@
 
   <ContactSection />
 </main>
-
-<!-- Skip to content link for accessibility -->
-<a href="#main-content" class="skip-link">Skip to main content</a>
 
 <style>
   main {

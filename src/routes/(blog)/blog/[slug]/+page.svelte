@@ -67,10 +67,41 @@
     <meta property="og:title" content={data.meta.title} />
     <meta property="og:description" content={data.meta.description} />
     <meta property="og:type" content="article" />
+    <meta
+        property="og:url"
+        content={`https://rishabhai.me/blog/${data.meta.slug || ""}`}
+    />
+    <meta property="og:image" content="https://rishabhai.me/og-image.png" />
     <link
         rel="canonical"
-        href={`https://rakshitbhai.github.io/Portfolio/blog/${data.meta.slug || ""}`}
+        href={`https://rishabhai.me/blog/${data.meta.slug || ""}`}
     />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={data.meta.title} />
+    <meta name="twitter:description" content={data.meta.description} />
+    <meta name="twitter:image" content="https://rishabhai.me/og-image.png" />
+
+    <!-- Structured Data for LLMs and Search Engines -->
+    {@html `<script type="application/ld+json">${JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: data.meta.title,
+        description: data.meta.description,
+        datePublished: data.meta.date,
+        author: {
+            "@type": "Person",
+            name: "Rishabh Shukla",
+            url: "https://rishabhai.me",
+        },
+        publisher: {
+            "@type": "Person",
+            name: "Rishabh Shukla",
+        },
+        mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": `https://rishabhai.me/blog/${data.meta.slug || ""}`,
+        },
+    })}</script>`}
 
     <!-- AdSense Script (Loads ONLY on blog post pages) -->
     <script
