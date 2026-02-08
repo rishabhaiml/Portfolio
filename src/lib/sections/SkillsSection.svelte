@@ -7,7 +7,7 @@
   import { onMount, onDestroy } from "svelte";
   import { eyeEvolution, currentSection } from "$lib/stores";
   import SharinganEye from "$lib/components/SharinganEye.svelte";
-  import chakraNatureSound from "$lib/assets/chakra-nature.mp3";
+  import chakraNatureSound from "$lib/assets/effects/chakra-nature.mp3";
 
   let sectionRef: HTMLElement;
   let isVisible = false;

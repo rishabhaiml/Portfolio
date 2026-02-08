@@ -116,16 +116,34 @@
       </div>
 
       <div class="gallery-text-overlay">
-        <h1 class="hero-name" class:visible={showName}>
-          <span class="name-text">
-            <span class="first-name">Rishabh</span>
-            <span class="last-name">Shukla</span>
-          </span>
-        </h1>
+        <div class="text-and-scroll-wrapper">
+          <div class="text-content">
+            <h1 class="hero-name" class:visible={showName}>
+              <span class="name-text">
+                <span class="first-name">Rishabh</span>
+                <span class="last-name">Shukla</span>
+              </span>
+            </h1>
 
-        <p class="hero-title" class:visible={showTitle}>
-          <span class="title-text text-gradient-sharingan">AI/ML Engineer</span>
-        </p>
+            <p class="hero-title" class:visible={showTitle}>
+              <span class="title-text text-gradient-sharingan"
+                >AI/ML Engineer</span
+              >
+            </p>
+          </div>
+
+          <!-- Scroll Indicator -->
+          <div class="scroll-indicator" aria-label="Scroll down">
+            <div class="kunai-scroll">
+              <img
+                src="/src/lib/assets/kunai.webp"
+                alt=""
+                style="height: 40px; width: auto;"
+              />
+            </div>
+            <span class="scroll-text">SCROLL</span>
+          </div>
+        </div>
       </div>
     </div>
   {:else}
@@ -190,14 +208,9 @@
       <!-- Scroll Indicator -->
       <div class="scroll-indicator" aria-label="Scroll down">
         <div class="kunai-scroll">
-          <svg viewBox="0 0 24 40" width="20" height="35">
-            <path
-              d="M12 0 L16 12 L14 12 L14 38 L12 40 L10 38 L10 12 L8 12 Z"
-              fill="var(--sharingan-red)"
-            />
-          </svg>
+          <img src="/src/lib/assets/kunai.webp" alt="" width="20" height="35" />
         </div>
-        <span class="scroll-text">Scroll to explore</span>
+        <span class="scroll-text">SCROLL</span>
       </div>
     </div>
   {/if}
@@ -273,6 +286,21 @@
     margin-top: -1rem; /* Slight overlap to tighten visual gap if gallery padding is large */
   }
 
+  .text-and-scroll-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem; /* Space between text and scroll indicator */
+    width: 100%;
+  }
+
+  .text-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   /* Text Styles */
   .hero.gallery-mode .hero-name {
     margin: 0;
@@ -316,6 +344,11 @@
 
     .gallery-text-overlay {
       margin-top: -0.5rem;
+    }
+
+    .text-and-scroll-wrapper {
+      flex-direction: column;
+      gap: 1.5rem; /* Reduced gap for mobile */
     }
   }
 
@@ -482,6 +515,24 @@
     align-items: center;
     gap: 0.5rem;
     animation: float 2s ease-in-out infinite;
+    z-index: 20; /* ensure it's above background */
+  }
+
+  /* Gallery mode: scroll indicator is positioned via flex, not absolute */
+  .hero.gallery-mode .scroll-indicator {
+    position: static;
+    transform: none;
+    animation: float-simple 2s ease-in-out infinite;
+  }
+
+  @keyframes float-simple {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
   }
 
   @keyframes float {
@@ -494,8 +545,14 @@
     }
   }
 
-  .kunai-scroll {
-    transform: rotate(180deg);
+  @keyframes float-mobile {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
   }
 
   .scroll-text {
@@ -561,7 +618,35 @@
     }
 
     .scroll-indicator {
-      display: none;
+      /* display: none; */ /* Re-enabled */
+      position: absolute; /* Keep absolute to pin to corner */
+      bottom: 1.5rem;
+      left: 1.5rem;
+      right: auto;
+      transform: none; /* remove centering */
+      margin-top: 0;
+      flex-direction: row; /* Horizontal layout for compact look */
+      align-items: center;
+      gap: 0.5rem;
+      animation: float-mobile 2s ease-in-out infinite;
+      z-index: 20;
+    }
+
+    .scroll-text {
+      font-size: 0.7rem;
+      writing-mode: vertical-rl; /* Vertical Japanese style text */
+      text-orientation: mixed;
+      transform: rotate(180deg); /* Read upwards */
+      letter-spacing: 0.15em;
+      opacity: 0.7;
+    }
+
+    /* Ensure Gallery Mode handles scroll indicator nicely on mobile */
+    .gallery-hero-layout {
+      height: calc(100vh - 64px); /* Restore full Viewport height */
+      height: calc(100dvh - 64px);
+      padding-bottom: 2rem;
+      justify-content: center;
     }
   }
 </style>

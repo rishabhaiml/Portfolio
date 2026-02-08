@@ -4,7 +4,7 @@
 -->
 <script lang="ts">
   import { onMount, createEventDispatcher } from "svelte";
-  import rasenganSoundFile from "$lib/assets/naruto_ha.mp3";
+  import rasenganSoundFile from "$lib/assets/effects/naruto_ha.mp3";
   import { fade } from "svelte/transition";
 
   export let size: number = 180; // Default larger size for detail

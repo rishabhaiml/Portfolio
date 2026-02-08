@@ -15,11 +15,12 @@
     rinneganMerged,
   } from "$lib/stores";
   import SharinganEye from "$lib/components/SharinganEye.svelte";
-  import { fade, fly } from "svelte/transition";
+  import SecretScrollTrigger from "$lib/components/SecretScrollTrigger.svelte";
+  import { fade, fly, slide } from "svelte/transition";
   import { tick } from "svelte";
-  import dattebayoSound from "$lib/assets/dattebayo.mp3";
-  import chakraSound from "$lib/assets/chakra-nature.mp3";
-  import narutoFace from "$lib/assets/naruto-face.png";
+  import dattebayoSound from "$lib/assets/effects/dattebayo.mp3";
+  import chakraSound from "$lib/assets/effects/chakra-nature.mp3";
+  import narutoFace from "$lib/assets/naruto-chat.webp";
   import rinneganSvg from "$lib/assets/Rinnegan_Sasuke.svg";
   import sasukeMangekyouSvg from "$lib/assets/Sasuke_Mangekyou.svg";
   import resumeFile from "$lib/assets/rishabh-resume.pdf";
@@ -43,6 +44,7 @@
 
   let sectionRef: HTMLElement;
   let isVisible = false;
+  let showDisclaimer = false;
 
   const contactInfo = {
     email: "rishabhshukla092@gmail.com",
@@ -691,6 +693,32 @@
             <span class="card-arrow">→</span>
           </a>
 
+          <!-- GitHub -->
+          <a
+            href="https://github.com/rishabhaiml"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="contact-card github"
+          >
+            <span class="card-icon">
+              <svg
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+                />
+              </svg>
+            </span>
+            <div class="card-content">
+              <span class="card-label">GitHub</span>
+              <span class="card-value">/rishabhaiml</span>
+            </div>
+            <span class="card-arrow">→</span>
+          </a>
+
           <!-- Location -->
           <div class="contact-card location">
             <span class="card-icon">📍</span>
@@ -710,20 +738,39 @@
       </div>
     </div>
 
+    <!-- Forbidden Scrolls Gateway (Blog Connector) -->
+    <SecretScrollTrigger />
+
     <!-- Footer -->
     <footer class="portfolio-footer">
       <p>Forged by Rishabh Shukla & AI • Powered by the Will of Fire 🔥</p>
       <p class="footer-ninja">The path of the ninja never ends.</p>
       <div class="legal-disclaimer">
-        <p>
-          <strong>Disclaimer:</strong> This portfolio is a non-profit, educational
-          project created solely to demonstrate technical skills. All characters,
-          names, audio, and visual assets related to 'Naruto' are identifiers of
-          and copyright to Masashi Kishimoto, Shueisha, Viz Media, and TV Tokyo.
-          No copyright infringement is intended. This project is not affiliated with,
-          endorsed by, or sponsored by the official copyright holders. Usage of these
-          assets falls under 'Fair Use' for educational and transformative purposes.
-        </p>
+        <button
+          class="disclaimer-toggle"
+          on:click={() => (showDisclaimer = !showDisclaimer)}
+          aria-expanded={showDisclaimer}
+        >
+          <span class="toggle-header">Sealed with Chakra</span>
+          <span class="toggle-indicator">
+            {showDisclaimer ? "Hide Protocol" : "View Protocol"}
+          </span>
+        </button>
+
+        {#if showDisclaimer}
+          <div class="disclaimer-content" transition:slide={{ duration: 300 }}>
+            <p>
+              <strong>Disclaimer:</strong> This portfolio is a non-profit, educational
+              project created solely to demonstrate technical skills. All characters,
+              names, audio, and visual assets related to 'Naruto' are identifiers
+              of and copyright to Masashi Kishimoto, Shueisha, Viz Media, and TV
+              Tokyo. No copyright infringement is intended. This project is not affiliated
+              with, endorsed by, or sponsored by the official copyright holders.
+              Usage of these assets falls under 'Fair Use' for educational and transformative
+              purposes.
+            </p>
+          </div>
+        {/if}
       </div>
     </footer>
 
@@ -1388,21 +1435,19 @@
   }
 
   .naruto-avatar {
-    width: 40px;
-    height: 40px;
-    background: #ff5500;
-    border-radius: 50%;
+    width: 65px;
+    height: 65px;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    border: 2px solid #fff;
   }
 
   .naruto-avatar img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
   }
 
   .header-info h3 {
@@ -1552,5 +1597,63 @@
     background: rgba(255, 255, 255, 0.3);
     border-color: rgba(255, 255, 255, 0.5);
     transform: translateY(-1px);
+  }
+
+  .legal-disclaimer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+  }
+
+  .disclaimer-toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem;
+    transition: opacity 0.3s ease;
+  }
+
+  .disclaimer-toggle:hover {
+    opacity: 0.8;
+  }
+
+  .toggle-header {
+    color: #ef4444; /* red-500 */
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+  }
+
+  .toggle-indicator {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .disclaimer-content {
+    text-align: justify;
+    padding: 1rem 0.5rem 0;
+    line-height: 1.6;
+  }
+
+  /* Footer Ninja Text */
+  .footer-ninja {
+    font-family: var(--font-heading);
+    color: #60a5fa;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
   }
 </style>

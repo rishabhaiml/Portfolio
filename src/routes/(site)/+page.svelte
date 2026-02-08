@@ -13,6 +13,7 @@
     sageMode,
     reducedMotion,
     loaderComplete,
+    isNavigating,
   } from "$lib/stores";
 
   // Components
@@ -26,11 +27,13 @@
   import SkillsSection from "$lib/sections/SkillsSection.svelte";
   import ProjectsSection from "$lib/sections/ProjectsSection.svelte";
   import ExperienceSection from "$lib/sections/ExperienceSection.svelte";
+
   import ContactSection from "$lib/sections/ContactSection.svelte";
   // Background Music (Removed: Handled by UchihaGallery)
 
   let scrollY = 0;
-  let isLoading = true;
+  // Initialize based on store: if loader already completed, don't show it again
+  let isLoading = !$loaderComplete;
   function handleKeydown(event: KeyboardEvent) {
     if (KONAMI_CODE[$konamiProgress] === event.code) {
       konamiProgress.update((p) => p + 1);
@@ -63,7 +66,8 @@
 
   // Check for reduced motion preference
   onMount(() => {
-    // isLoading is now controlled by RasenganLoader event
+    // Reset navigation state from blog transition
+    isNavigating.set(false);
 
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     reducedMotion.set(mediaQuery.matches);
@@ -139,7 +143,7 @@
       "url": "https://rishabhai.me",
       "jobTitle": "AI/ML Engineer",
       "sameAs": [
-        "https://github.com/rakshitbhai",
+        "https://github.com/rishabhaiml",
         "https://linkedin.com/in/rishabhbshukla"
       ],
       "description": "Junior AI/ML Engineer specializing in NLP, LLMs, and high-performance backends."
@@ -176,6 +180,7 @@
   <SkillsSection />
   <ProjectsSection />
   <ExperienceSection />
+
   <ContactSection />
 </main>
 

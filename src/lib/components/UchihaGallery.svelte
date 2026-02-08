@@ -39,9 +39,23 @@
     // Initial activation trigger for Itachi when loader completes
     let initialActivation = false;
 
-    // React to loader completion
-    // React to loader completion
-    $: if ($loaderComplete) {
+    // TRANSITION-BASED TRIGGER: Only fire when loaderComplete changes from false → true
+    // This correctly handles:
+    // - Fresh load: loaderComplete starts false, becomes true → PLAY
+    // - Return from blog: loaderComplete is already true on mount → DON'T PLAY
+    let previousLoaderComplete = false;
+    let hasMounted = false;
+
+    onMount(() => {
+        // Capture initial state AFTER mount
+        // If loaderComplete is already true, we're returning from blog
+        previousLoaderComplete = $loaderComplete;
+        hasMounted = true;
+    });
+
+    // Watch for loaderComplete transitions (only after mount to avoid SSR issues)
+    $: if (hasMounted && $loaderComplete && !previousLoaderComplete) {
+        previousLoaderComplete = true; // Update immediately to prevent re-entry
         // Small delay to ensure smooth transition from loader to gallery
         setTimeout(() => {
             initialActivation = true;

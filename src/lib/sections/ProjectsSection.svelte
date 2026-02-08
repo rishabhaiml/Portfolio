@@ -5,7 +5,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { eyeEvolution, currentSection } from "$lib/stores";
-  import sealSound from "$lib/assets/naruto_seal.mp3";
+  import sealSound from "$lib/assets/effects/naruto_seal.mp3";
 
   let sectionRef: HTMLElement;
   let isVisible = false;

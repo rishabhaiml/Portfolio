@@ -7,7 +7,7 @@
 <script lang="ts">
   import { isNavigating } from "$lib/stores";
   import { onMount } from "svelte";
-  import kamuiSoundFile from "$lib/assets/kamui.mp3";
+  import kamuiSoundFile from "$lib/assets/effects/kamui.mp3";
   import SharinganEye from "$lib/components/SharinganEye.svelte";
 
   export let duration: number = 2200;
@@ -190,9 +190,17 @@
   onMount(() => {
     ctx = canvas.getContext("2d");
 
+    // CRITICAL: Reset navigation state on mount to prevent overlay persisting
+    // This handles the case where user navigates back from blog
+    isNavigating.set(false);
+    phase = "idle";
+    shouldActivate = false;
+
     function resize() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      // Clear canvas on resize to prevent artifacts
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     resize();
@@ -205,6 +213,8 @@
     return () => {
       window.removeEventListener("resize", resize);
       if (animationFrame) cancelAnimationFrame(animationFrame);
+      // Ensure clean state on unmount
+      isNavigating.set(false);
     };
   });
 </script>
