@@ -68,7 +68,7 @@
     ssc: "In his 10th Standard (SSC) [2016-2017], Rishabh scored 83.00%! He showed early brilliance with 96/100 in Mathematics and 96/100 in Science.",
     hsc: "For his 12th Standard (HSC), he secured 60.92%. Notably, he scored 148/200 in Computer Science, marking the beginning of his ninja path in programming and technology.",
     bca: "Rishabh completed his Graduation (BCA) from K. P. B. Hinduja College (2019-2022) with a solid CGPA of 8.13/10.0. He built a strong foundation in CS and developed a passion for AI/ML and mobile development.",
-    mca: "He is currently pursuing his Masters (MCA) at MET Institute of Computer Science (2024-2026 Expected). He holds a CGPA of 8.5/10.0 and is working on a Thesis: 'Deep Learning for Real-Time Music Visualization' focusing on audio pattern recognition.",
+    mca: "He is currently pursuing his Masters (MCA) at MET Institute of Computer Science (2024-2026 Expected). He holds a CGPA of 7.5/10.0 and is working on a Thesis: 'Deep Learning for Real-Time Music Visualization' focusing on audio pattern recognition.",
 
     // Fallbacks
     projects:
@@ -121,8 +121,13 @@
   let messages: Message[] = [
     {
       id: 1,
-      text: "Dattebayo! I'm Naruto Uzumaki! Are you here to uncover the secrets of Rishabh's ninja way? Ask me about his skills, missions, or experience!",
+      text: "Dattebayo! I'm Naruto Uzumaki! I am the Shinobi Archive for Rishabh.\n\nTry asking me things like:\n• What skills does Rishabh have?\n• Tell me about his projects\n• What is his work experience?\n• How can I contact him?\n• What technologies does he use?",
       sender: "naruto",
+      action: {
+        type: "file",
+        label: "📜 Download Resume",
+        value: resumeFile,
+      },
     },
   ];
 
@@ -177,7 +182,10 @@
     isTyping = true;
 
     // Resume Logic
-    const lowerText = userText.toLowerCase().replace(/[^\w\s]/g, ""); // Remove punctuation
+    const lowerText = userText
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, ""); // Remove punctuation
     let responseText = "";
     let actionButton:
       | { type: "email" | "link" | "file"; label: string; value: string }
@@ -186,14 +194,50 @@
     // --- 1. Greetings & Personal Status ---
     // Use hasWholeWord for greetings to prevent "hi" matching inside "his" or "history"
     if (
-      hasWholeWord(lowerText, ["hello", "hi", "hey", "greetings", "konnichiwa"])
+      hasWholeWord(lowerText, [
+        "hello",
+        "hi",
+        "hii",
+        "hiii",
+        "hey",
+        "heya",
+        "heyo",
+        "greetings",
+        "konnichiwa",
+        "good morning",
+        "good evening",
+        "good afternoon",
+        "yo",
+        "sup",
+        "wassup",
+        "hola",
+        "namaste",
+      ])
     ) {
-      responseText = "Dattebayo! Hello there! Ready to learn about Rishabh?";
+      responseText =
+        "Dattebayo! Hello there! I am the Shinobi Archive for Rishabh.\n\nTry asking me things like:\n• What skills does Rishabh have?\n• Tell me about his projects\n• What is his work experience?\n• How can I contact him?\n• What technologies does he use?";
+      actionButton = {
+        type: "file",
+        label: "📜 Download Resume",
+        value: resumeFile,
+      };
     } else if (
       hasWholeWord(lowerText, ["how are you", "how are u", "doing", "status"])
     ) {
       responseText =
         "I'm doing great, preparing for my next mission! Rishabh is also doing fantastic, coding up some S-rank jutsu!";
+    } else if (
+      hasAny(lowerText, [
+        "who are you",
+        "who is rishabh",
+        "tell me about yourself",
+        "introduce yourself",
+        "what do you do",
+        "where are you from",
+        "what is your background",
+      ])
+    ) {
+      responseText = resumeData.summary;
     }
 
     // --- 2. Time & Age Specific Logic ---
@@ -489,6 +533,8 @@
           "experience",
           "company",
           "developer",
+          "internship",
+          "worked on",
         ])
       ) {
         responseText = resumeData.freelance;
@@ -502,13 +548,21 @@
           "tool",
           "language",
           "framework",
+          "what technologies does he use",
         ])
       ) {
         responseText = resumeData.skills;
       }
       // 7. Projects
       else if (
-        hasAny(lowerText, ["project", "app", "built", "created", "thesis"])
+        hasAny(lowerText, [
+          "project",
+          "app",
+          "built",
+          "created",
+          "thesis",
+          "portfolio",
+        ])
       ) {
         responseText = resumeData.projects;
       }
@@ -523,14 +577,24 @@
           "percent",
           "cgpa",
           "marks",
+          "college",
+          "degree",
+          "university",
         ])
       ) {
         // If asking generically about marks/education without a specific level, give a summary
         responseText =
-          "He has done his MCA (8.5 CGPA), BCA (8.13 CGPA), 12th (60.92%), and 10th (83%). Ask me specifically about any of them for more details!";
+          "He has done his MCA (7.5 CGPA), BCA (8.13 CGPA), 12th (60.92%), and 10th (83%). Ask me specifically about any of them for more details!";
       }
       // 9. Name
-      else if (hasAny(lowerText, ["name", "who are you", "who is rishabh"])) {
+      else if (
+        hasAny(lowerText, [
+          "name",
+          "who are you",
+          "who is rishabh",
+          "full name",
+        ])
+      ) {
         responseText = resumeData.name;
       }
       // 10. Summary / About
@@ -548,7 +612,15 @@
       }
       // 11. Contact
       else if (
-        hasAny(lowerText, ["contact", "email", "mail", "reach", "social"])
+        hasAny(lowerText, [
+          "contact",
+          "email",
+          "mail",
+          "reach",
+          "social",
+          "hire",
+          "reach you",
+        ])
       ) {
         responseText =
           "You can contact him directly via email at " +
@@ -564,20 +636,18 @@
         // Found a relevant answer
         narutoMsg = {
           id: Date.now() + 1,
-          text: "Dattebayo! " + responseText,
+          text: responseText.startsWith("Dattebayo")
+            ? responseText
+            : "Dattebayo! " + responseText,
           // Removed manual "Here is what I know" to make custom responses flow better
           sender: "naruto",
           action: actionButton,
         };
       } else {
-        // Irrelevant question - Naruto Quote + Redirect
-        const randomQuote =
-          narutoQuotes[Math.floor(Math.random() * narutoQuotes.length)];
+        // Irrelevant question - Helpful fallback with suggestions
         narutoMsg = {
           id: Date.now() + 1,
-          text:
-            randomQuote +
-            " ... But seriously, I think you should focus on asking relevant questions about Rishabh's skills, projects, or experience! That's the ninja way!",
+          text: "Sorry! I can only answer questions about Rishabh's ninja way—his skills, projects, experience, education, and portfolio.\n\nTry asking me things like:\n• What skills does Rishabh have?\n• Tell me about his projects\n• What is his work experience?\n• How can I contact him?\n• What technologies does he use?",
           sender: "naruto",
         };
       }
@@ -693,7 +763,18 @@
             rel="noopener noreferrer"
             class="contact-card linkedin"
           >
-            <span class="card-icon">💼</span>
+            <span class="card-icon">
+              <svg
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                fill="currentColor"
+              >
+                <path
+                  d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+                />
+              </svg>
+            </span>
             <div class="card-content">
               <span class="card-label">LinkedIn</span>
               <span class="card-value">{contactInfo.linkedin}</span>
@@ -1499,6 +1580,7 @@
     border-radius: 12px;
     font-size: 0.95rem;
     line-height: 1.4;
+    white-space: pre-wrap;
   }
 
   .message.naruto {

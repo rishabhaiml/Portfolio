@@ -61,7 +61,7 @@
       period: "2024 - 2026 (Expected)",
       type: "education" as const,
       description: [
-        "CGPA: 8.5/10.0",
+        "CGPA: 7.5/10.0",
         "Thesis: Deep Learning for Real-Time Music Visualization",
         "Focus on AI/ML and audio pattern recognition",
       ],

@@ -126,8 +126,7 @@
             </h1>
 
             <p class="hero-title" class:visible={showTitle}>
-              <span class="title-text text-gradient-sharingan"
-                >AI/ML Engineer</span
+              <span class="title-text text-gradient-sharingan">AI Engineer</span
               >
             </p>
           </div>
@@ -164,7 +163,7 @@
 
       <!-- Title -->
       <p class="hero-title" class:visible={showTitle}>
-        <span class="title-text text-gradient-sharingan">AI/ML Engineer</span>
+        <span class="title-text text-gradient-sharingan">AI Engineer</span>
       </p>
 
       <!-- Summary -->
